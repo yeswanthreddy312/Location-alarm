@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { MapPin, Save, Search, Loader2 } from 'lucide-react';
+import { MapPin, Save, Search, Loader2, Clock, Ruler } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -19,6 +19,8 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [radius, setRadius] = useState([500]);
+  const [triggerMode, setTriggerMode] = useState('distance');
+  const [triggerTime, setTriggerTime] = useState([30]);
   const [isActive, setIsActive] = useState(true);
   const [recurring, setRecurring] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,13 +34,13 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
       setRadius([alarm.radius]);
       setIsActive(alarm.is_active);
       setRecurring(alarm.recurring);
+      setTriggerMode(alarm.trigger_mode || 'distance');
+      setTriggerTime([alarm.trigger_time || 30]);
     } else if (tempMarker) {
       setLatitude(tempMarker.lat.toString());
       setLongitude(tempMarker.lng.toString());
       setSearchQuery(tempMarker.address || `Location from map (${tempMarker.lat.toFixed(4)}, ${tempMarker.lng.toFixed(4)})`);
-      if (tempMarker.name) {
-        setName(tempMarker.name);
-      }
+      if (tempMarker.name) setName(tempMarker.name);
     } else if (userLocation) {
       setLatitude(userLocation.lat.toString());
       setLongitude(userLocation.lng.toString());
@@ -46,34 +48,21 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
   }, [alarm, userLocation, tempMarker]);
 
   const searchPlace = async (query) => {
-    if (!query || query.length < 3) {
-      setSearchResults([]);
-      return;
-    }
-
+    if (!query || query.length < 3) { setSearchResults([]); return; }
     setIsSearching(true);
     try {
       const params = { q: query, limit: 5 };
-      // Bias results near user's GPS location if available
-      if (userLocation) {
-        params.lat = userLocation.lat;
-        params.lon = userLocation.lng;
-      }
-
-      const response = await axios.get(`${API}/geocode`, { params });
-
-      if (response.data.success && response.data.results) {
-        setSearchResults(response.data.results);
+      if (userLocation) { params.lat = userLocation.lat; params.lon = userLocation.lng; }
+      const res = await axios.get(`${API}/geocode`, { params });
+      if (res.data.success && res.data.results) {
+        setSearchResults(res.data.results);
         setShowResults(true);
       } else {
         setSearchResults([]);
-        if (response.data.error) {
-          toast.error(response.data.error);
-        }
+        if (res.data.error) toast.error(res.data.error);
       }
-    } catch (error) {
-      console.error('Search error:', error);
-      toast.error('Failed to search location. Please try again.');
+    } catch {
+      toast.error('Failed to search location');
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -81,12 +70,8 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
   };
 
   const handleSearchFocus = () => {
-    // Scroll input into view when keyboard opens
     setTimeout(() => {
-      document.querySelector('[data-testid="place-search-input"]')?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
+      document.querySelector('[data-testid="place-search-input"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 300);
   };
 
@@ -102,13 +87,7 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
     setLongitude(place.lon);
     setSearchQuery(place.display_name);
     setShowResults(false);
-    
-    // Auto-fill alarm name from location
-    if (!name) {
-      const locationName = place.display_name.split(',')[0];
-      setName(locationName);
-    }
-    
+    if (!name) setName(place.display_name.split(',')[0]);
     toast.success('Location selected');
   };
 
@@ -117,12 +96,7 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
       setLatitude(userLocation.lat.toString());
       setLongitude(userLocation.lng.toString());
       setSearchQuery('Current Location');
-      
-      // Auto-fill name if empty
-      if (!name) {
-        setName('Current Location');
-      }
-      
+      if (!name) setName('Current Location');
       toast.success('Using current location');
     } else {
       toast.error('Current location not available');
@@ -131,51 +105,45 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!latitude || !longitude) {
-      toast.error('Please select a location first');
-      return;
-    }
-
+    if (!latitude || !longitude) { toast.error('Please select a location first'); return; }
     const lat = parseFloat(latitude);
     const lng = parseFloat(longitude);
-
     if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-      toast.error('Invalid coordinates');
-      return;
+      toast.error('Invalid coordinates'); return;
     }
 
     setIsSubmitting(true);
-
     try {
-      // Use location name as fallback if name is empty
-      const alarmName = name || searchQuery.split(',')[0] || 'Location Alarm';
-      
       const alarmData = {
-        name: alarmName,
+        name: name || searchQuery.split(',')[0] || 'Location Alarm',
         latitude: lat,
         longitude: lng,
         radius: radius[0],
         sound: 'default',
         is_active: isActive,
         recurring,
+        trigger_mode: triggerMode,
+        trigger_time: triggerMode === 'time' ? triggerTime[0] : null,
       };
 
       if (alarm) {
         await axios.put(`${API}/alarms/${alarm.id}`, alarmData);
-        toast.success('Alarm updated successfully');
+        toast.success('Alarm updated');
       } else {
         await axios.post(`${API}/alarms`, alarmData);
-        toast.success('Alarm created successfully');
+        toast.success('Alarm created');
       }
-
       onClose();
-    } catch (error) {
-      console.error('Error saving alarm:', error);
+    } catch {
       toast.error('Failed to save alarm');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const formatTime = (min) => {
+    if (min >= 60) return `${Math.floor(min / 60)}h ${min % 60 > 0 ? `${min % 60}m` : ''}`;
+    return `${min} min`;
   };
 
   return (
@@ -184,13 +152,11 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
         <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Manrope' }}>
           {alarm ? 'Edit Alarm' : 'New Alarm'}
         </h2>
-        <p className="text-sm text-slate-400 mt-1">
-          Set a location-based alarm for your trip
-        </p>
+        <p className="text-sm text-slate-400 mt-1">Set a location-based alarm for your trip</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Search Location - PRIMARY */}
+        {/* Search Location */}
         <div className="space-y-3">
           <Label className="text-slate-200">Search Location</Label>
           <div className="relative">
@@ -204,29 +170,18 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
                 className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 pl-10"
                 data-testid="place-search-input"
               />
-              {isSearching && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400 animate-spin" />
-              )}
+              {isSearching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400 animate-spin" />}
             </div>
-            
-            {/* Search Results Dropdown */}
+
             {showResults && searchResults.length > 0 && (
               <div className="absolute top-full mt-2 w-full bg-slate-800 border border-slate-700 rounded-lg shadow-2xl z-50 max-h-60 overflow-y-auto">
-                {searchResults.map((result, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => selectPlace(result)}
-                    className="w-full text-left px-4 py-3 hover:bg-slate-700 border-b border-slate-700 last:border-b-0 transition-colors"
-                    data-testid={`search-result-${index}`}
-                  >
+                {searchResults.map((result, i) => (
+                  <button key={i} type="button" onClick={() => selectPlace(result)} className="w-full text-left px-4 py-3 hover:bg-slate-700 border-b border-slate-700 last:border-b-0" data-testid={`search-result-${i}`}>
                     <div className="flex items-start gap-2">
                       <MapPin className="w-4 h-4 text-emerald-400 mt-1 flex-shrink-0" />
                       <div>
                         <p className="text-sm text-white">{result.display_name}</p>
-                        <p className="text-xs text-slate-400 mt-1">
-                          {parseFloat(result.lat).toFixed(4)}, {parseFloat(result.lon).toFixed(4)}
-                        </p>
+                        <p className="text-xs text-slate-400 mt-1">{parseFloat(result.lat).toFixed(4)}, {parseFloat(result.lon).toFixed(4)}</p>
                       </div>
                     </div>
                   </button>
@@ -235,18 +190,11 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
             )}
           </div>
 
-          <Button
-            type="button"
-            onClick={handleUseCurrentLocation}
-            variant="outline"
-            className="w-full bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
-            data-testid="use-current-location-btn"
-          >
+          <Button type="button" onClick={handleUseCurrentLocation} variant="outline" className="w-full bg-slate-800 border-slate-700 text-white hover:bg-slate-700" data-testid="use-current-location-btn">
             <MapPin className="w-4 h-4 mr-2" />
             Use Current Location
           </Button>
 
-          {/* Show selected coordinates */}
           {latitude && longitude && (
             <div className="text-xs text-slate-400 mt-2">
               Selected: {parseFloat(latitude).toFixed(4)}, {parseFloat(longitude).toFixed(4)}
@@ -254,93 +202,100 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
           )}
         </div>
 
-        {/* Alarm Name - OPTIONAL/SECONDARY */}
+        {/* Alarm Name */}
         <div className="space-y-2">
           <Label htmlFor="name" className="text-slate-200">
             Alarm Name <span className="text-xs text-slate-500">(auto-filled)</span>
           </Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Will be set from location"
-            className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-            data-testid="alarm-name-input"
-          />
-          <p className="text-xs text-slate-500">
-            Name is automatically set from location. Edit if needed.
-          </p>
+          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Will be set from location" className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500" data-testid="alarm-name-input" />
         </div>
 
-        {/* Radius */}
+        {/* Trigger Mode Toggle */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-slate-200">Alert Radius</Label>
-            <span className="text-sm text-emerald-400 font-medium">{radius[0]}m</span>
+          <Label className="text-slate-200">Alert Type</Label>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              onClick={() => setTriggerMode('distance')}
+              className={`flex-1 py-3 rounded-lg transition-all ${triggerMode === 'distance' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+              data-testid="mode-distance-btn"
+            >
+              <Ruler className="w-4 h-4 mr-2 inline" />
+              Distance
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setTriggerMode('time')}
+              className={`flex-1 py-3 rounded-lg transition-all ${triggerMode === 'time' ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+              data-testid="mode-time-btn"
+            >
+              <Clock className="w-4 h-4 mr-2 inline" />
+              Time
+            </Button>
           </div>
-          <Slider
-            value={radius}
-            onValueChange={setRadius}
-            min={100}
-            max={5000}
-            step={100}
-            className="w-full"
-            data-testid="radius-slider"
-          />
-          <p className="text-xs text-slate-500">
-            You'll be alerted when within {radius[0]} meters of this location
-          </p>
         </div>
+
+        {/* Distance or Time Slider */}
+        {triggerMode === 'distance' ? (
+          <div className="space-y-3" data-vaul-no-drag>
+            <div className="flex items-center justify-between">
+              <Label className="text-slate-200">Alert Radius</Label>
+              <span className="text-sm text-emerald-400 font-medium">{radius[0]}m</span>
+            </div>
+            <Slider
+              value={radius}
+              onValueChange={setRadius}
+              min={100}
+              max={5000}
+              step={100}
+              className="w-full"
+              data-testid="radius-slider"
+            />
+            <p className="text-xs text-slate-500">Alert when within {radius[0]}m of this location</p>
+          </div>
+        ) : (
+          <div className="space-y-3" data-vaul-no-drag>
+            <div className="flex items-center justify-between">
+              <Label className="text-slate-200">Alert Before Arrival</Label>
+              <span className="text-sm text-blue-400 font-medium">{formatTime(triggerTime[0])}</span>
+            </div>
+            <Slider
+              value={triggerTime}
+              onValueChange={setTriggerTime}
+              min={5}
+              max={120}
+              step={5}
+              className="w-full"
+              data-testid="time-slider"
+            />
+            <p className="text-xs text-slate-500">Alert ~{formatTime(triggerTime[0])} before reaching destination</p>
+          </div>
+        )}
 
         {/* Recurring */}
         <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-slate-700">
           <div>
             <Label htmlFor="recurring" className="text-slate-200 cursor-pointer">Recurring Alarm</Label>
-            <p className="text-xs text-slate-500 mt-1">
-              Alarm will trigger every time you enter the area
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Alarm triggers every time you enter the area</p>
           </div>
-          <Switch
-            id="recurring"
-            checked={recurring}
-            onCheckedChange={setRecurring}
-            data-testid="recurring-switch"
-          />
+          <Switch id="recurring" checked={recurring} onCheckedChange={setRecurring} data-testid="recurring-switch" />
         </div>
 
-        {/* Active Status */}
+        {/* Active */}
         <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-slate-700">
           <div>
             <Label htmlFor="active" className="text-slate-200 cursor-pointer">Active</Label>
-            <p className="text-xs text-slate-500 mt-1">
-              Enable or disable this alarm
-            </p>
+            <p className="text-xs text-slate-500 mt-1">Enable or disable this alarm</p>
           </div>
-          <Switch
-            id="active"
-            checked={isActive}
-            onCheckedChange={setIsActive}
-            data-testid="active-switch"
-          />
+          <Switch id="active" checked={isActive} onCheckedChange={setIsActive} data-testid="active-switch" />
         </div>
 
-        {/* Submit Buttons */}
+        {/* Submit */}
         <div className="flex gap-3 pt-4">
-          <Button
-            type="button"
-            onClick={onClose}
-            variant="outline"
-            className="flex-1 bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
-            data-testid="cancel-btn"
-          >
+          <Button type="button" onClick={onClose} variant="outline" className="flex-1 bg-slate-800 border-slate-700 text-white hover:bg-slate-700" data-testid="cancel-btn">
             Cancel
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting || !latitude || !longitude}
-            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50"
-            data-testid="save-alarm-btn"
-          >
+          <Button type="submit" disabled={isSubmitting || !latitude || !longitude} className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white disabled:opacity-50" data-testid="save-alarm-btn">
             <Save className="w-4 h-4 mr-2" />
             {isSubmitting ? 'Saving...' : alarm ? 'Update' : 'Create'}
           </Button>
