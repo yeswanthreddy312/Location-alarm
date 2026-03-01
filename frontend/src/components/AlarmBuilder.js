@@ -321,9 +321,12 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
             <div className="ml-[7px] h-5 border-l-2 border-dashed border-slate-700" />
 
             {/* Stop row — tappable */}
-            <button
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => startEdit(i)}
-              className="flex items-center gap-3 py-2.5 w-full text-left hover:bg-slate-800/60 rounded-lg px-1 -mx-1 transition-colors group"
+              onKeyDown={(e) => e.key === 'Enter' && startEdit(i)}
+              className="flex items-center gap-3 py-2.5 w-full text-left hover:bg-slate-800/60 rounded-lg px-1 -mx-1 transition-colors group cursor-pointer"
               data-testid={`stop-row-${i}`}
             >
               <div className={`w-3 h-3 rounded-full ml-0.5 ${
@@ -347,7 +350,7 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
-            </button>
+            </div>
           </React.Fragment>
         ))}
       </div>
