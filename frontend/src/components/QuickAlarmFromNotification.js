@@ -32,16 +32,15 @@ const QuickAlarmFromNotification = ({ sharedText, onClose, onAddWaypoints }) => 
     setIsCreating(true);
 
     try {
-      // Search for destination coordinates
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dest)}&limit=1`,
-        { headers: { 'User-Agent': 'LocationAlarmApp/1.0' } }
-      );
+      // Use our backend proxy to geocode (bypasses browser CORS restrictions)
+      const response = await axios.get(`${API}/geocode`, {
+        params: { q: dest }
+      });
 
-      if (response.data && response.data.length > 0) {
-        const place = response.data[0];
+      if (response.data.success && response.data.place) {
+        const place = response.data.place;
         
-        // Create alarm immediately
+        // Create alarm immediately with real coordinates
         const alarmData = {
           name: dest,
           latitude: parseFloat(place.lat),
