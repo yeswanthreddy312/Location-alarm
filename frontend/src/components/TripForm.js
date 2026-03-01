@@ -295,10 +295,10 @@ Or copy trip details and paste here.`;
     <div className="space-y-6 pb-20">
       <div>
         <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Manrope' }}>
-          Plan Your Trip
+          {editTrip ? 'Edit Your Trip' : 'Plan Your Trip'}
         </h2>
         <p className="text-sm text-slate-400 mt-1">
-          Create a journey with multiple stops
+          {editTrip ? 'Modify stops or add new waypoints' : 'Create a journey with multiple stops'}
         </p>
       </div>
 
