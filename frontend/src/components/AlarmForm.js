@@ -50,18 +50,15 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
 
     setIsSearching(true);
     try {
-      // Add city context if not already present
-      let searchQuery = query;
-      if (!query.toLowerCase().includes('bangalore') && 
-          !query.toLowerCase().includes('india')) {
-        searchQuery = `${query}, Bangalore, India`;
+      const params = { q: query, limit: 5 };
+      // Bias results near user's GPS location if available
+      if (userLocation) {
+        params.lat = userLocation.lat;
+        params.lon = userLocation.lng;
       }
-      
-      // Use backend proxy to bypass CORS restrictions
-      const response = await axios.get(`${API}/geocode`, {
-        params: { q: searchQuery, limit: 5 }
-      });
-      
+
+      const response = await axios.get(`${API}/geocode`, { params });
+
       if (response.data.success && response.data.results) {
         setSearchResults(response.data.results);
         setShowResults(true);
