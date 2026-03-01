@@ -248,7 +248,23 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
           <Input
             value={form.searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)}
+            onFocus={(e) => {
+              const el = e.target;
+              const scrollIntoInput = () => {
+                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                // Also ensure parent drawer content scrolls
+                const drawer = el.closest('[data-vaul-drawer-content]') || el.closest('.overflow-y-auto');
+                if (drawer) {
+                  const rect = el.getBoundingClientRect();
+                  if (rect.top < 0 || rect.bottom > window.visualViewport?.height) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  }
+                }
+              };
+              // Delay to wait for keyboard to fully open
+              setTimeout(scrollIntoInput, 300);
+              setTimeout(scrollIntoInput, 600);
+            }}
             placeholder="Search for a place..."
             className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 pl-10"
             data-testid="builder-search-input"

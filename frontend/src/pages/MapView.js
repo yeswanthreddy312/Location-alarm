@@ -127,7 +127,7 @@ const MapView = () => {
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-slate-950">
+    <div className="flex flex-col bg-slate-950" style={{ height: '100dvh' }}>
       {/* Map Section */}
       <div className="relative" style={{ height: '42vh', minHeight: '240px' }}>
         <MapContainer center={mapCenter} zoom={13} className="h-full w-full" zoomControl={false}>
@@ -288,7 +288,7 @@ const MapView = () => {
       <Drawer.Root open={showBuilder} onOpenChange={setShowBuilder}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] h-[85vh] mt-16 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10" aria-describedby="builder-desc">
+          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10" style={{ height: '85dvh', maxHeight: '85dvh' }} aria-describedby="builder-desc">
             <Drawer.Title className="sr-only">Alarm Builder</Drawer.Title>
             <p id="builder-desc" className="sr-only">Create or edit</p>
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto">
