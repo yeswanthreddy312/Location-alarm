@@ -174,14 +174,21 @@ Or copy trip details and paste here.`;
 
     updateWaypoint(index, { isSearching: true });
     try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
-        { headers: { 'User-Agent': 'LocationAlarmApp/1.0' } }
-      );
-      updateWaypoint(index, { searchResults: response.data, showResults: true });
+      // Use backend proxy to bypass CORS restrictions
+      const response = await axios.get(`${API}/geocode`, {
+        params: { q: query }
+      });
+      
+      if (response.data.success && response.data.place) {
+        // Format as array for consistency
+        updateWaypoint(index, { searchResults: [response.data.place], showResults: true });
+      } else {
+        updateWaypoint(index, { searchResults: [] });
+      }
     } catch (error) {
       console.error('Search error:', error);
       toast.error('Failed to search location');
+      updateWaypoint(index, { searchResults: [] });
     } finally {
       updateWaypoint(index, { isSearching: false });
     }
