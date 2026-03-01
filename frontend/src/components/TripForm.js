@@ -39,6 +39,8 @@ const TripForm = ({ onClose, editTrip = null, editAlarms = null, userLocation = 
         latitude: a.latitude.toString(),
         longitude: a.longitude.toString(),
         radius: a.radius,
+        triggerMode: a.trigger_mode || 'distance',
+        triggerTime: a.trigger_time || 30,
         searchQuery: a.name,
         searchResults: [],
         isSearching: false,
