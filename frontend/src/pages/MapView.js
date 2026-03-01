@@ -11,6 +11,8 @@ import axios from 'axios';
 import AlarmForm from '@/components/AlarmForm';
 import AlarmList from '@/components/AlarmList';
 import AlarmHistory from '@/components/AlarmHistory';
+import TripForm from '@/components/TripForm';
+import TripList from '@/components/TripList';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
