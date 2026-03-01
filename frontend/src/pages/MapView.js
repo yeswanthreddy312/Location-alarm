@@ -571,7 +571,13 @@ const MapView = () => {
 
               {/* Content based on mode */}
               <div className="flex-1 overflow-y-auto">
-                {addMode === 'alarm' ? (
+                {addMode === 'notification' ? (
+                  <QuickAlarmFromNotification
+                    sharedText={notificationData}
+                    onClose={handleFormClose}
+                    onAddWaypoints={handleAddWaypointsFromNotification}
+                  />
+                ) : addMode === 'alarm' ? (
                   <AlarmForm
                     alarm={selectedAlarm}
                     userLocation={userLocation}
@@ -583,6 +589,7 @@ const MapView = () => {
                     onClose={handleFormClose}
                     editTrip={editingTrip}
                     editAlarms={editingTripAlarms}
+                    prefillData={notificationData}
                   />
                 )}
               </div>
