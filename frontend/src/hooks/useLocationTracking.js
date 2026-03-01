@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import axios from 'axios';
+import { storage } from '@/utils/storage';
 import { toast } from 'sonner';
-
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export function useLocationTracking(alarms, onAlarmUpdate) {
   const [userLocation, setUserLocation] = useState(null);
@@ -13,18 +11,16 @@ export function useLocationTracking(alarms, onAlarmUpdate) {
   const audioRef = useRef(null);
   const triggeredRef = useRef(new Set());
   const alarmsRef = useRef(alarms);
+  const speedRef = useRef(null);
 
-  // Keep alarmsRef in sync without restarting watchPosition
   useEffect(() => { alarmsRef.current = alarms; }, [alarms]);
 
-  // Initialize audio once
   useEffect(() => {
     audioRef.current = new Audio('/sounds/alarm.mp3');
     audioRef.current.loop = true;
     return () => { audioRef.current?.pause(); };
   }, []);
 
-  // Get initial location
   useEffect(() => {
     if (!('geolocation' in navigator)) return;
     navigator.geolocation.getCurrentPosition(
@@ -49,57 +45,35 @@ export function useLocationTracking(alarms, onAlarmUpdate) {
   };
 
   const stopSound = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; }
   }, []);
 
   const triggerAlarm = useCallback((alarm) => {
     audioRef.current?.play().catch(() => {});
     navigator.vibrate?.([500, 200, 500, 200, 500]);
-
     toast.success(alarm.name, {
       description: 'You have reached your destination!',
       duration: 10000,
       action: { label: 'Stop', onClick: stopSound },
     });
-
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(alarm.name, {
-        body: 'You have reached your destination!',
-        icon: '/logo192.png',
-        vibrate: [500, 200, 500],
-      });
+      new Notification(alarm.name, { body: 'You have reached your destination!', icon: '/logo192.png', vibrate: [500, 200, 500] });
     }
-
-    // Log to history
-    axios.post(`${API}/alarm-history`, {
-      alarm_id: alarm.id,
-      alarm_name: alarm.name,
-      latitude: alarm.latitude,
-      longitude: alarm.longitude,
-    }).catch(() => {});
+    storage.addHistory({ alarm_id: alarm.id, alarm_name: alarm.name, latitude: alarm.latitude, longitude: alarm.longitude });
   }, [stopSound]);
-
-  const speedRef = useRef(null); // m/s from GPS
 
   const checkAlarms = useCallback((lat, lng) => {
     const currentAlarms = alarmsRef.current;
     for (const alarm of currentAlarms) {
       if (!alarm.is_active) continue;
       const d = getDistance(lat, lng, alarm.latitude, alarm.longitude);
-
       let shouldTrigger = false;
 
       if (alarm.trigger_mode === 'time' && alarm.trigger_time) {
-        // Time-based: estimate arrival time
-        // Use GPS speed if available, else fallback 40 km/h (~11 m/s)
         const speed = (speedRef.current && speedRef.current > 1) ? speedRef.current : 11;
         const etaMinutes = (d / speed) / 60;
         shouldTrigger = etaMinutes <= alarm.trigger_time;
       } else {
-        // Distance-based (default)
         shouldTrigger = d <= alarm.radius;
       }
 
@@ -107,35 +81,26 @@ export function useLocationTracking(alarms, onAlarmUpdate) {
         triggerAlarm(alarm);
         triggeredRef.current.add(alarm.id);
         if (!alarm.recurring) {
-          axios.put(`${API}/alarms/${alarm.id}`, { is_active: false })
-            .then(() => onAlarmUpdate?.())
-            .catch(() => {});
+          storage.updateAlarm(alarm.id, { is_active: false });
+          onAlarmUpdate?.();
         }
       }
-      // Reset triggered state when far enough away
-      if (!shouldTrigger) {
-        triggeredRef.current.delete(alarm.id);
-      }
+      if (!shouldTrigger) triggeredRef.current.delete(alarm.id);
     }
   }, [triggerAlarm, onAlarmUpdate]);
 
   const toggleTracking = useCallback(() => {
     if (isTracking) {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
+      if (watchIdRef.current !== null) { navigator.geolocation.clearWatch(watchIdRef.current); watchIdRef.current = null; }
       stopSound();
       setIsTracking(false);
       toast.info('Tracking stopped');
     } else {
-      if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
-      }
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
       watchIdRef.current = navigator.geolocation.watchPosition(
         (pos) => {
           const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          speedRef.current = pos.coords.speed; // m/s or null
+          speedRef.current = pos.coords.speed;
           setUserLocation(loc);
           checkAlarms(loc.lat, loc.lng);
         },
@@ -147,7 +112,6 @@ export function useLocationTracking(alarms, onAlarmUpdate) {
     }
   }, [isTracking, checkAlarms, stopSound]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current);
