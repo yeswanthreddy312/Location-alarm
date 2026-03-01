@@ -35,6 +35,9 @@ Build a mobile-first Progressive Web App (PWA) that functions as a location-base
 - Distance and time-to-reach trigger modes
 - Trip start/destination/waypoint management
 - Mobile keyboard bug fix (viewport meta + dvh units + scrollIntoView)
+- PWA app icon (map pin + bell, emerald/dark theme) in all required sizes
+- Full-screen standalone mode with Apple iOS meta tags
+- Proper favicon, apple-touch-icon, and maskable icons
 
 ## Bug Fixes Applied
 - Mobile keyboard hiding search input: Fixed with `interactive-widget=resizes-content` viewport meta, `dvh` CSS units, improved scrollIntoView logic
