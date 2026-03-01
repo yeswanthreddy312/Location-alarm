@@ -574,6 +574,46 @@ const MapView = () => {
           </Drawer.Content>
         </Drawer.Portal>
       </Drawer.Root>
+
+      {/* Trip Form Drawer */}
+      <Drawer.Root open={showTripForm} onOpenChange={setShowTripForm}>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
+          <Drawer.Content 
+            className="bg-slate-900 flex flex-col rounded-t-[24px] h-[90vh] mt-12 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10"
+            aria-describedby="trip-form-desc"
+          >
+            <Drawer.Title className="sr-only">Create New Trip</Drawer.Title>
+            <p id="trip-form-desc" className="sr-only">
+              Plan a trip with multiple waypoints
+            </p>
+            <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto">
+              <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mb-6" />
+              <TripForm onClose={handleFormClose} />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+
+      {/* Trip List Drawer */}
+      <Drawer.Root open={showTripList} onOpenChange={setShowTripList}>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
+          <Drawer.Content 
+            className="bg-slate-900 flex flex-col rounded-t-[24px] h-[70vh] mt-24 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10"
+            aria-describedby="trip-list-desc"
+          >
+            <Drawer.Title className="sr-only">My Trips</Drawer.Title>
+            <p id="trip-list-desc" className="sr-only">
+              View and manage all your planned trips
+            </p>
+            <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto pb-20">
+              <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mb-6" />
+              <TripList />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
     </div>
   );
 };
