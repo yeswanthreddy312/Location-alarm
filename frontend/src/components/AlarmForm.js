@@ -50,19 +50,22 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
 
     setIsSearching(true);
     try {
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`,
-        {
-          headers: {
-            'User-Agent': 'LocationAlarmApp/1.0'
-          }
-        }
-      );
-      setSearchResults(response.data);
-      setShowResults(true);
+      // Use backend proxy to bypass CORS restrictions
+      const response = await axios.get(`${API}/geocode`, {
+        params: { q: query }
+      });
+      
+      if (response.data.success && response.data.place) {
+        // Format as array for consistency with old structure
+        setSearchResults([response.data.place]);
+        setShowResults(true);
+      } else {
+        setSearchResults([]);
+      }
     } catch (error) {
       console.error('Search error:', error);
       toast.error('Failed to search location');
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
