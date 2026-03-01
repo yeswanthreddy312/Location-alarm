@@ -219,21 +219,30 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
   // ─── EDITOR VIEW ───
   if (editing !== null) {
     const isNew = editing === 'new';
-    const isFirst = isNew && stops.length === 0;
-    const title = isFirst ? 'Where are you going?' : isNew ? 'Add a stop' : `Edit ${stops[editing]?.name || 'stop'}`;
+    const isAskingStart = isNew && stops.length === 0;
+    const isAskingDest = isNew && stops.length === 1 && stops[0].type === 'start';
+    const title = isAskingStart ? 'Where are you starting?'
+      : isAskingDest ? 'Where are you going?'
+      : isNew ? 'Add a stop'
+      : `Edit ${stops[editing]?.name || 'stop'}`;
 
     return (
       <div className="space-y-5">
         {/* Header */}
         <div className="flex items-center gap-3">
-          {!isFirst && (
-            <button onClick={() => { setEditing(null); setForm(emptyForm()); }} className="text-slate-400 hover:text-white" data-testid="editor-back-btn">
+          {!isAskingStart && (
+            <button onClick={() => {
+              if (isAskingDest) { startEdit(0); } // Back to editing start
+              else { setEditing(null); setForm(emptyForm()); }
+            }} className="text-slate-400 hover:text-white" data-testid="editor-back-btn">
               <ChevronLeft className="w-5 h-5" />
             </button>
           )}
           <div>
             <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Manrope' }}>{title}</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Search a location, then set your alarm</p>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {isAskingStart ? 'Set your departure point' : 'Search a location, then set your alarm'}
+            </p>
           </div>
         </div>
 
