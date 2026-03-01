@@ -39,6 +39,11 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
         radius: a.radius, type: a.waypoint_type || 'stop',
       })));
     } else if (tempMarker) {
+      // Map click: auto-add start with GPS, pre-fill destination from marker
+      const startStop = userLocation
+        ? { name: 'Current Location', lat: userLocation.lat, lng: userLocation.lng, triggerMode: 'distance', triggerTime: 30, radius: 500, type: 'start' }
+        : null;
+      if (startStop) setStops([startStop]);
       setEditing('new');
       setForm({
         ...emptyForm(),
@@ -47,9 +52,18 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
         name: tempMarker.name || '',
       });
     } else {
+      // Fresh: ask for start location, pre-fill with GPS
       setEditing('new');
+      if (userLocation) {
+        setForm({
+          ...emptyForm(),
+          lat: userLocation.lat, lng: userLocation.lng,
+          searchQuery: 'Current Location',
+          name: 'Current Location',
+        });
+      }
     }
-  }, [editAlarm, editTrip, editTripAlarms, tempMarker]);
+  }, [editAlarm, editTrip, editTripAlarms, tempMarker, userLocation]);
 
   // Search
   const searchPlace = async (query) => {
