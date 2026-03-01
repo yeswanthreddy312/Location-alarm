@@ -204,6 +204,7 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
               <Input
                 value={searchQuery}
                 onChange={handleSearchChange}
+                onFocus={handleSearchFocus}
                 placeholder="Search for a place..."
                 className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 pl-10"
                 data-testid="place-search-input"
