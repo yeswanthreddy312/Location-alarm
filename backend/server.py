@@ -319,49 +319,69 @@ async def get_alarm_history_by_id(alarm_id: str):
 
 
 @api_router.get("/geocode")
-async def geocode_place(q: str, limit: int = 5):
+async def geocode_place(q: str, limit: int = 5, lat: Optional[float] = None, lon: Optional[float] = None):
     """
-    Geocode a place name using OpenStreetMap Nominatim
-    Acts as a proxy to bypass browser CORS restrictions
-    Returns multiple results for better search experience
+    Geocode a place name using OpenStreetMap Nominatim.
+    Optionally accepts lat/lon to bias results near user's location.
     """
     try:
+        params = {
+            "format": "json",
+            "q": q,
+            "limit": limit,
+            "addressdetails": 1,
+            "countrycodes": "in",
+        }
+        # Bias results near user's GPS location if provided
+        if lat is not None and lon is not None:
+            delta = 1.0  # ~110km viewbox around user
+            params["viewbox"] = f"{lon - delta},{lat + delta},{lon + delta},{lat - delta}"
+            params["bounded"] = 0  # prefer but don't restrict
+
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 "https://nominatim.openstreetmap.org/search",
-                params={
-                    "format": "json",
-                    "q": q,
-                    "limit": limit,
-                    "addressdetails": 1,
-                    "countrycodes": "in"  # Focus on India for better local results
-                },
-                headers={
-                    "User-Agent": "LocationAlarmApp/1.0"
-                },
-                timeout=10.0
+                params=params,
+                headers={"User-Agent": "LocationAlarmApp/1.0"},
+                timeout=10.0,
             )
-            
+
             if response.status_code == 200:
                 data = response.json()
                 if data and len(data) > 0:
-                    return {
-                        "success": True,
-                        "results": data  # Return all results, not just first
-                    }
-                else:
-                    return {
-                        "success": False,
-                        "error": "No locations found. Try being more specific."
-                    }
-            else:
-                raise HTTPException(status_code=response.status_code, detail="Geocoding service error")
-                
+                    return {"success": True, "results": data}
+                return {"success": False, "error": "No locations found. Try being more specific."}
+            raise HTTPException(status_code=response.status_code, detail="Geocoding service error")
+
     except httpx.TimeoutException:
         raise HTTPException(status_code=504, detail="Geocoding service timeout")
     except Exception as e:
         logger.error(f"Geocoding error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to search location")
+
+
+@api_router.get("/reverse-geocode")
+async def reverse_geocode(lat: float, lon: float):
+    """Reverse geocode coordinates to an address using Nominatim."""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://nominatim.openstreetmap.org/reverse",
+                params={"format": "json", "lat": lat, "lon": lon, "addressdetails": 1},
+                headers={"User-Agent": "LocationAlarmApp/1.0"},
+                timeout=10.0,
+            )
+            if response.status_code == 200:
+                data = response.json()
+                if "display_name" in data:
+                    return {"success": True, "display_name": data["display_name"], "address": data.get("address", {})}
+                return {"success": False, "error": "No address found for these coordinates."}
+            raise HTTPException(status_code=response.status_code, detail="Reverse geocoding error")
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="Reverse geocoding timeout")
+    except Exception as e:
+        logger.error(f"Reverse geocoding error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to reverse geocode")
 
 
 @api_router.get("/")
