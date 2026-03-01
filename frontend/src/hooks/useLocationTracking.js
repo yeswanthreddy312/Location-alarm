@@ -135,6 +135,7 @@ export function useLocationTracking(alarms, onAlarmUpdate) {
       watchIdRef.current = navigator.geolocation.watchPosition(
         (pos) => {
           const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          speedRef.current = pos.coords.speed; // m/s or null
           setUserLocation(loc);
           checkAlarms(loc.lat, loc.lng);
         },
