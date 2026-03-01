@@ -14,27 +14,50 @@ from datetime import datetime, timezone
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
 app = FastAPI()
-
-# Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
 
-# Define Models
+# Models
+class TripCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    start_location: str
+    end_location: str
+
+class Trip(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: Optional[str] = None
+    start_location: str
+    end_location: str
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TripUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    start_location: Optional[str] = None
+    end_location: Optional[str] = None
+    is_active: Optional[bool] = None
+
 class AlarmCreate(BaseModel):
     name: str
     latitude: float
     longitude: float
-    radius: int = Field(default=500, description="Radius in meters")
+    radius: int = Field(default=500)
     sound: str = Field(default="default")
     is_active: bool = Field(default=True)
     recurring: bool = Field(default=False)
+    trip_id: Optional[str] = None
+    sequence: Optional[int] = None
+    waypoint_type: Optional[str] = None
 
 class Alarm(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -47,6 +70,9 @@ class Alarm(BaseModel):
     sound: str
     is_active: bool
     recurring: bool
+    trip_id: Optional[str] = None
+    sequence: Optional[int] = None
+    waypoint_type: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     triggered_at: Optional[datetime] = None
 
@@ -65,6 +91,7 @@ class AlarmHistoryCreate(BaseModel):
     alarm_name: str
     latitude: float
     longitude: float
+    trip_id: Optional[str] = None
 
 class AlarmHistory(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -74,7 +101,97 @@ class AlarmHistory(BaseModel):
     alarm_name: str
     latitude: float
     longitude: float
+    trip_id: Optional[str] = None
     triggered_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+# Trip Routes
+@api_router.post("/trips", response_model=Trip)
+async def create_trip(trip_input: TripCreate):
+    """Create a new trip"""
+    trip_dict = trip_input.model_dump()
+    trip_obj = Trip(**trip_dict)
+    
+    doc = trip_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.trips.insert_one(doc)
+    return trip_obj
+
+@api_router.get("/trips", response_model=List[Trip])
+async def get_trips():
+    """Get all trips"""
+    trips = await db.trips.find({}, {"_id": 0}).to_list(1000)
+    
+    for trip in trips:
+        if isinstance(trip['created_at'], str):
+            trip['created_at'] = datetime.fromisoformat(trip['created_at'])
+    
+    return trips
+
+@api_router.get("/trips/{trip_id}", response_model=Trip)
+async def get_trip(trip_id: str):
+    """Get a specific trip"""
+    trip = await db.trips.find_one({"id": trip_id}, {"_id": 0})
+    
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    
+    if isinstance(trip['created_at'], str):
+        trip['created_at'] = datetime.fromisoformat(trip['created_at'])
+    
+    return trip
+
+@api_router.put("/trips/{trip_id}", response_model=Trip)
+async def update_trip(trip_id: str, trip_update: TripUpdate):
+    """Update a trip"""
+    update_data = {k: v for k, v in trip_update.model_dump().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No update data provided")
+    
+    result = await db.trips.update_one(
+        {"id": trip_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    
+    updated_trip = await db.trips.find_one({"id": trip_id}, {"_id": 0})
+    
+    if isinstance(updated_trip['created_at'], str):
+        updated_trip['created_at'] = datetime.fromisoformat(updated_trip['created_at'])
+    
+    return updated_trip
+
+@api_router.delete("/trips/{trip_id}")
+async def delete_trip(trip_id: str):
+    """Delete a trip and its associated alarms"""
+    result = await db.trips.delete_one({"id": trip_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    
+    await db.alarms.delete_many({"trip_id": trip_id})
+    
+    return {"message": "Trip and associated alarms deleted successfully"}
+
+@api_router.get("/trips/{trip_id}/alarms", response_model=List[Alarm])
+async def get_trip_alarms(trip_id: str):
+    """Get all alarms for a specific trip, ordered by sequence"""
+    alarms = await db.alarms.find(
+        {"trip_id": trip_id}, 
+        {"_id": 0}
+    ).sort("sequence", 1).to_list(1000)
+    
+    for alarm in alarms:
+        if isinstance(alarm['created_at'], str):
+            alarm['created_at'] = datetime.fromisoformat(alarm['created_at'])
+        if alarm.get('triggered_at') and isinstance(alarm['triggered_at'], str):
+            alarm['triggered_at'] = datetime.fromisoformat(alarm['triggered_at'])
+    
+    return alarms
 
 
 # Alarm Routes
@@ -204,7 +321,6 @@ async def get_alarm_history_by_id(alarm_id: str):
 async def root():
     return {"message": "Location Alarm API"}
 
-# Include the router in the main app
 app.include_router(api_router)
 
 app.add_middleware(
@@ -215,7 +331,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
