@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Circle, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin, Bell, Plus, List as ListIcon, Navigation, History, X } from 'lucide-react';
+import { MapPin, Bell, Plus, List as ListIcon, Navigation, History, X, Navigation2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Drawer } from 'vaul';
