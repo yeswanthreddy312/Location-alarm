@@ -154,11 +154,8 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
   };
 
   const removeStop = (i) => {
-    const next = stops.filter((_, idx) => idx !== i);
-    if (next.length > 0 && i === stops.length - 1) {
-      next[next.length - 1].type = 'destination';
-    }
-    setStops(next);
+    if (stops[i].type === 'start' || stops[i].type === 'destination') return;
+    setStops(stops.filter((_, idx) => idx !== i));
   };
 
   const addWaypoint = () => {
