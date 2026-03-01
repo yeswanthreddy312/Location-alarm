@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { MapPin, Save, Plus, X, Search, Loader2, Navigation2 } from 'lucide-react';
+import { MapPin, Save, Plus, X, Search, Loader2, Navigation2, Clock, Ruler } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
