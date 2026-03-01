@@ -82,13 +82,28 @@ export function useLocationTracking(alarms, onAlarmUpdate) {
     }).catch(() => {});
   }, [stopSound]);
 
+  const speedRef = useRef(null); // m/s from GPS
+
   const checkAlarms = useCallback((lat, lng) => {
     const currentAlarms = alarmsRef.current;
     for (const alarm of currentAlarms) {
       if (!alarm.is_active) continue;
       const d = getDistance(lat, lng, alarm.latitude, alarm.longitude);
 
-      if (d <= alarm.radius && !triggeredRef.current.has(alarm.id)) {
+      let shouldTrigger = false;
+
+      if (alarm.trigger_mode === 'time' && alarm.trigger_time) {
+        // Time-based: estimate arrival time
+        // Use GPS speed if available, else fallback 40 km/h (~11 m/s)
+        const speed = (speedRef.current && speedRef.current > 1) ? speedRef.current : 11;
+        const etaMinutes = (d / speed) / 60;
+        shouldTrigger = etaMinutes <= alarm.trigger_time;
+      } else {
+        // Distance-based (default)
+        shouldTrigger = d <= alarm.radius;
+      }
+
+      if (shouldTrigger && !triggeredRef.current.has(alarm.id)) {
         triggerAlarm(alarm);
         triggeredRef.current.add(alarm.id);
         if (!alarm.recurring) {
@@ -97,7 +112,8 @@ export function useLocationTracking(alarms, onAlarmUpdate) {
             .catch(() => {});
         }
       }
-      if (d > alarm.radius) {
+      // Reset triggered state when far enough away
+      if (!shouldTrigger) {
         triggeredRef.current.delete(alarm.id);
       }
     }
