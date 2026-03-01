@@ -112,15 +112,15 @@ const MapView = () => {
           };
           setUserLocation(location);
           setMapCenter([location.lat, location.lng]);
+          toast.success('Location access granted');
         },
         (error) => {
           console.error('Error getting location:', error);
-          toast.error('Unable to get your location');
+          // Don't show error toast - just use default location
+          // toast.error('Unable to get your location');
         },
         { enableHighAccuracy: true }
       );
-    } else {
-      toast.error('Geolocation is not supported by your browser');
     }
   }, []);
 
