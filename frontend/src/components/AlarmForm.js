@@ -50,25 +50,44 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
 
     setIsSearching(true);
     try {
+      // Add city context if not already present
+      let searchQuery = query;
+      if (!query.toLowerCase().includes('bangalore') && 
+          !query.toLowerCase().includes('india')) {
+        searchQuery = `${query}, Bangalore, India`;
+      }
+      
       // Use backend proxy to bypass CORS restrictions
       const response = await axios.get(`${API}/geocode`, {
-        params: { q: query }
+        params: { q: searchQuery, limit: 5 }
       });
       
-      if (response.data.success && response.data.place) {
-        // Format as array for consistency with old structure
-        setSearchResults([response.data.place]);
+      if (response.data.success && response.data.results) {
+        setSearchResults(response.data.results);
         setShowResults(true);
       } else {
         setSearchResults([]);
+        if (response.data.error) {
+          toast.error(response.data.error);
+        }
       }
     } catch (error) {
       console.error('Search error:', error);
-      toast.error('Failed to search location');
+      toast.error('Failed to search location. Please try again.');
       setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const handleSearchFocus = () => {
+    // Scroll input into view when keyboard opens
+    setTimeout(() => {
+      document.querySelector('[data-testid="place-search-input"]')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }, 300);
   };
 
   const handleSearchChange = (e) => {
