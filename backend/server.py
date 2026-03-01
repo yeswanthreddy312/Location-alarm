@@ -59,6 +59,8 @@ class AlarmCreate(BaseModel):
     trip_id: Optional[str] = None
     sequence: Optional[int] = None
     waypoint_type: Optional[str] = None
+    trigger_mode: str = Field(default="distance")  # "distance" or "time"
+    trigger_time: Optional[int] = None  # minutes, used when trigger_mode="time"
 
 class Alarm(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -74,6 +76,8 @@ class Alarm(BaseModel):
     trip_id: Optional[str] = None
     sequence: Optional[int] = None
     waypoint_type: Optional[str] = None
+    trigger_mode: str = Field(default="distance")
+    trigger_time: Optional[int] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     triggered_at: Optional[datetime] = None
 
@@ -86,6 +90,8 @@ class AlarmUpdate(BaseModel):
     is_active: Optional[bool] = None
     recurring: Optional[bool] = None
     triggered_at: Optional[datetime] = None
+    trigger_mode: Optional[str] = None
+    trigger_time: Optional[int] = None
 
 class AlarmHistoryCreate(BaseModel):
     alarm_id: str
