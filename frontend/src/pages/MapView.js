@@ -338,7 +338,17 @@ const MapView = () => {
     setSelectedAlarm(null);
     setTempMarker(null);
     setAddMode('alarm');
+    setEditingTrip(null);
+    setEditingTripAlarms(null);
     fetchAlarms();
+  };
+
+  const handleEditTrip = (trip, alarms) => {
+    setEditingTrip(trip);
+    setEditingTripAlarms(alarms);
+    setAddMode('trip');
+    setShowTripList(false);
+    setShowAddDrawer(true);
   };
 
   return (
