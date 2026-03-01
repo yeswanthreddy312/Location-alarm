@@ -333,9 +333,9 @@ const MapView = () => {
 
   const handleFormClose = () => {
     setShowAddDrawer(false);
-    setShowTripForm(false);
     setSelectedAlarm(null);
     setTempMarker(null);
+    setAddMode('alarm');
     fetchAlarms();
   };
 
