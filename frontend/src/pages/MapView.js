@@ -397,38 +397,36 @@ const MapView = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Actions */}
-        <div className="mt-auto p-4 pointer-events-auto">
-          <div className="flex gap-3 justify-end items-end">
-            {/* Center on User Button */}
-            <Button
-              onClick={centerOnUser}
-              className="w-14 h-14 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-white/10 shadow-lg"
-              data-testid="center-location-btn"
-            >
-              <Navigation className="w-5 h-5" />
-            </Button>
+      {/* FAB Buttons - Fixed Position */}
+      <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-3 items-end pointer-events-auto">
+        {/* Center on User Button */}
+        <Button
+          onClick={centerOnUser}
+          className="w-14 h-14 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-white/10 shadow-lg"
+          data-testid="center-location-btn"
+        >
+          <Navigation className="w-5 h-5" />
+        </Button>
 
-            {/* Alarm List Button */}
-            <Button
-              onClick={() => setShowListDrawer(true)}
-              className="w-14 h-14 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-white/10 shadow-lg"
-              data-testid="show-alarm-list-btn"
-            >
-              <ListIcon className="w-5 h-5" />
-            </Button>
+        {/* Alarm List Button */}
+        <Button
+          onClick={() => setShowListDrawer(true)}
+          className="w-14 h-14 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-white/10 shadow-lg"
+          data-testid="show-alarm-list-btn"
+        >
+          <ListIcon className="w-5 h-5" />
+        </Button>
 
-            {/* Add Alarm Button (FAB) */}
-            <Button
-              onClick={handleAddAlarm}
-              className="w-16 h-16 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.5)] transition-transform hover:scale-105 active:scale-95"
-              data-testid="add-alarm-btn"
-            >
-              <Plus className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
+        {/* Add Alarm Button (FAB) */}
+        <Button
+          onClick={handleAddAlarm}
+          className="w-16 h-16 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_20px_-5px_rgba(16,185,129,0.5)] transition-transform hover:scale-105 active:scale-95"
+          data-testid="add-alarm-btn"
+        >
+          <Plus className="w-6 h-6" />
+        </Button>
       </div>
 
       {/* Add/Edit Alarm Drawer */}
