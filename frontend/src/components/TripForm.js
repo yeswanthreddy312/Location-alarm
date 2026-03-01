@@ -507,7 +507,7 @@ Or copy trip details and paste here.`;
             data-testid="create-trip-btn"
           >
             <Save className="w-4 h-4 mr-2" />
-            {isSubmitting ? 'Creating...' : 'Create Trip'}
+            {isSubmitting ? 'Saving...' : editTrip ? 'Update Trip' : 'Create Trip'}
           </Button>
         </div>
       </form>
