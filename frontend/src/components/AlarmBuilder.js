@@ -120,7 +120,14 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
 
     if (editing === 'new') {
       if (stops.length === 0) {
-        setStops([{ ...stop, type: 'destination' }]);
+        // First stop = Start. Add it, then immediately ask for destination.
+        setStops([{ ...stop, type: 'start' }]);
+        setForm(emptyForm());
+        setEditing('new');
+        return;
+      } else if (stops.length === 1 && stops[0].type === 'start') {
+        // Second stop = Destination
+        setStops([...stops, { ...stop, type: 'destination' }]);
       } else {
         // Insert as waypoint before destination
         const next = [...stops];
