@@ -13,6 +13,7 @@ import AlarmList from '@/components/AlarmList';
 import AlarmHistory from '@/components/AlarmHistory';
 import TripForm from '@/components/TripForm';
 import TripList from '@/components/TripList';
+import QuickAlarmFromNotification from '@/components/QuickAlarmFromNotification';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
