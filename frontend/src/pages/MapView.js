@@ -559,7 +559,11 @@ const MapView = () => {
                     onClose={handleFormClose}
                   />
                 ) : (
-                  <TripForm onClose={handleFormClose} />
+                  <TripForm 
+                    onClose={handleFormClose}
+                    editTrip={editingTrip}
+                    editAlarms={editingTripAlarms}
+                  />
                 )}
               </div>
             </div>
