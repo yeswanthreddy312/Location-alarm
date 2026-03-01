@@ -263,6 +263,37 @@ const TripForm = ({ onClose, editTrip = null, editAlarms = null, userLocation = 
                   {parseFloat(wp.latitude).toFixed(4)}, {parseFloat(wp.longitude).toFixed(4)}
                 </div>
               )}
+
+              {/* Trigger Mode */}
+              <div className="space-y-2">
+                <div className="flex gap-1">
+                  <button type="button" onClick={() => updateWaypoint(index, { triggerMode: 'distance' })}
+                    className={`flex-1 py-1.5 rounded text-xs font-medium transition-all ${wp.triggerMode === 'distance' ? 'bg-emerald-500 text-white' : 'bg-slate-600 text-slate-400'}`}
+                    data-testid={`wp-mode-distance-${index}`}
+                  >
+                    <Ruler className="w-3 h-3 inline mr-1" />Distance
+                  </button>
+                  <button type="button" onClick={() => updateWaypoint(index, { triggerMode: 'time' })}
+                    className={`flex-1 py-1.5 rounded text-xs font-medium transition-all ${wp.triggerMode === 'time' ? 'bg-blue-500 text-white' : 'bg-slate-600 text-slate-400'}`}
+                    data-testid={`wp-mode-time-${index}`}
+                  >
+                    <Clock className="w-3 h-3 inline mr-1" />Time
+                  </button>
+                </div>
+                <div data-vaul-no-drag>
+                  {wp.triggerMode === 'distance' ? (
+                    <div className="flex items-center gap-2">
+                      <Slider value={[wp.radius]} onValueChange={([v]) => updateWaypoint(index, { radius: v })} min={100} max={5000} step={100} className="flex-1" data-testid={`wp-radius-${index}`} />
+                      <span className="text-xs text-emerald-400 w-14 text-right">{wp.radius}m</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Slider value={[wp.triggerTime]} onValueChange={([v]) => updateWaypoint(index, { triggerTime: v })} min={5} max={120} step={5} className="flex-1" data-testid={`wp-time-${index}`} />
+                      <span className="text-xs text-blue-400 w-14 text-right">{wp.triggerTime}m</span>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           ))}
 
