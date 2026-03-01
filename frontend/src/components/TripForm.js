@@ -441,13 +441,14 @@ Or copy trip details and paste here.`;
 
                 {/* Search Results */}
                 {waypoint.showResults && waypoint.searchResults.length > 0 && (
-                  <div className="absolute mt-2 w-full bg-slate-700 border border-slate-600 rounded-lg shadow-2xl z-50 max-h-48 overflow-y-auto">
+                  <div className="mt-2 w-full bg-slate-700 border border-slate-600 rounded-lg shadow-2xl z-50 max-h-48 overflow-y-auto">
                     {waypoint.searchResults.map((result, resIndex) => (
                       <button
                         key={resIndex}
                         type="button"
                         onClick={() => selectPlace(result, index)}
                         className="w-full text-left px-3 py-2 hover:bg-slate-600 border-b border-slate-600 last:border-b-0 transition-colors"
+                        data-testid={`waypoint-result-${index}-${resIndex}`}
                       >
                         <div className="flex items-start gap-2">
                           <MapPin className="w-3 h-3 text-emerald-400 mt-1 flex-shrink-0" />
