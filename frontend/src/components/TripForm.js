@@ -28,6 +28,30 @@ const TripForm = ({ onClose, prefillData = null, editTrip = null, editAlarms = n
   ];
 
   useEffect(() => {
+    // Load existing trip for editing
+    if (editTrip && editAlarms) {
+      setTripName(editTrip.name);
+      setDescription(editTrip.description || '');
+      
+      // Convert alarms to waypoints format
+      const waypointsFromAlarms = editAlarms.map(alarm => ({
+        id: alarm.id,
+        name: alarm.name,
+        type: alarm.waypoint_type || 'stop',
+        latitude: alarm.latitude.toString(),
+        longitude: alarm.longitude.toString(),
+        radius: alarm.radius,
+        searchQuery: alarm.name,
+        searchResults: [],
+        isSearching: false,
+        showResults: false
+      }));
+      
+      setWaypoints(waypointsFromAlarms);
+      toast.info('Editing trip - Add or remove waypoints as needed');
+      return;
+    }
+    
     // Check URL parameters for shared trip data
     const urlParams = new URLSearchParams(window.location.search);
     const sharedText = urlParams.get('text') || urlParams.get('title');
@@ -35,7 +59,7 @@ const TripForm = ({ onClose, prefillData = null, editTrip = null, editAlarms = n
     if (sharedText || prefillData) {
       parseSharedTripData(sharedText || prefillData);
     }
-  }, [prefillData]);
+  }, [prefillData, editTrip, editAlarms]);
 
   const parseSharedTripData = async (text) => {
     if (!text) return;
