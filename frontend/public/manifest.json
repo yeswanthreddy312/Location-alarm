@@ -25,5 +25,31 @@
   "display": "standalone",
   "theme_color": "#020617",
   "background_color": "#020617",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "Quick Alarm",
+      "short_name": "Alarm",
+      "description": "Create a quick location alarm",
+      "url": "/?action=alarm",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Plan Trip",
+      "short_name": "Trip",
+      "description": "Plan a multi-stop trip",
+      "url": "/?action=trip",
+      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+    }
+  ]
 }

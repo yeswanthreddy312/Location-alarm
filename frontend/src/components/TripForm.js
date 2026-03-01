@@ -1,21 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import axios from 'axios';
-import { MapPin, Save, Plus, X, Search, Loader2, Navigation2 } from 'lucide-react';
+import { MapPin, Save, Plus, X, Search, Loader2, Navigation2, Sparkles, Copy } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const TripForm = ({ onClose }) => {
+const TripForm = ({ onClose, prefillData = null }) => {
   const [tripName, setTripName] = useState('');
   const [description, setDescription] = useState('');
   const [waypoints, setWaypoints] = useState([
     { name: '', type: 'start', latitude: '', longitude: '', radius: 500, searchQuery: '', searchResults: [], isSearching: false, showResults: false },
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showIntegrationTip, setShowIntegrationTip] = useState(false);
 
   const waypointTypes = [
     { value: 'start', label: '🏁 Start', color: 'text-blue-400' },
@@ -25,6 +26,44 @@ const TripForm = ({ onClose }) => {
     { value: 'fuel', label: '⛽ Fuel', color: 'text-green-400' },
     { value: 'destination', label: '🎯 Destination', color: 'text-red-400' },
   ];
+
+  useEffect(() => {
+    // Check URL parameters for shared trip data
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedText = urlParams.get('text') || urlParams.get('title');
+    
+    if (sharedText || prefillData) {
+      parseSharedTripData(sharedText || prefillData);
+    }
+  }, [prefillData]);
+
+  const parseSharedTripData = (text) => {
+    if (!text) return;
+
+    // Simple parsing - extract destination
+    const match = text.match(/to ([A-Za-z\s]+)/i);
+    if (match) {
+      const destination = match[1].trim();
+      setTripName(`Trip to ${destination}`);
+      toast.success('Trip details detected from Android!', {
+        description: `Destination: ${destination}`,
+        icon: <Sparkles className="w-4 h-4" />
+      });
+    }
+  };
+
+  const copyShareInstructions = () => {
+    const instructions = `To use with Android notifications:
+1. When you get "Trip to Hyderabad" notification
+2. Long press → Share
+3. Choose "Location Alarm"
+4. Trip form opens pre-filled!
+
+Or copy trip details and paste here.`;
+    
+    navigator.clipboard.writeText(instructions);
+    toast.success('Instructions copied!');
+  };
 
   const searchPlace = async (query, index) => {
     if (!query || query.length < 3) {
@@ -149,6 +188,48 @@ const TripForm = ({ onClose }) => {
         <p className="text-sm text-slate-400 mt-1">
           Create a journey with multiple stops
         </p>
+      </div>
+
+      {/* Android Integration Tip */}
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+        <div className="flex items-start gap-2">
+          <Sparkles className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-xs text-blue-300 font-medium mb-1">
+              💡 Pro Tip: Use with Android Calendar
+            </p>
+            <p className="text-xs text-blue-200/80">
+              When you get trip notification from Google Calendar, share it to this app for instant setup!
+            </p>
+            <Button
+              type="button"
+              onClick={() => setShowIntegrationTip(!showIntegrationTip)}
+              variant="ghost"
+              size="sm"
+              className="mt-2 h-auto p-0 text-xs text-blue-400 hover:text-blue-300"
+            >
+              {showIntegrationTip ? 'Hide' : 'Show'} instructions
+            </Button>
+          </div>
+        </div>
+        
+        {showIntegrationTip && (
+          <div className="mt-3 pl-6 space-y-1 text-xs text-blue-200/70">
+            <p>1. Get trip notification (e.g., "Trip to Hyderabad tomorrow")</p>
+            <p>2. Long press notification → Share</p>
+            <p>3. Choose "Location Alarm"</p>
+            <p>4. Trip form opens pre-filled!</p>
+            <Button
+              type="button"
+              onClick={copyShareInstructions}
+              size="sm"
+              className="mt-2 h-7 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-xs"
+            >
+              <Copy className="w-3 h-3 mr-1" />
+              Copy Instructions
+            </Button>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
