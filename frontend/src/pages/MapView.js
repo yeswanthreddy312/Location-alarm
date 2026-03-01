@@ -443,39 +443,48 @@ const MapView = () => {
 
       {/* Android-style Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-auto">
-        <div className="bg-slate-900/95 backdrop-blur-xl border-t border-white/10 px-4 py-3 flex items-center justify-around">
+        <div className="bg-slate-900/95 backdrop-blur-xl border-t border-white/10 px-2 py-3 flex items-center justify-around">
           <Button
-            onClick={centerOnUser}
+            onClick={() => setShowTripList(true)}
             variant="ghost"
-            className="flex flex-col items-center gap-1 h-auto py-2 px-4 text-slate-300 hover:text-emerald-400 hover:bg-transparent transition-colors"
-            data-testid="nav-location-btn"
+            className="flex flex-col items-center gap-1 h-auto py-2 px-3 text-slate-300 hover:text-emerald-400 hover:bg-transparent transition-colors"
+            data-testid="nav-trips-btn"
           >
-            <Navigation className="w-6 h-6" />
-            <span className="text-xs">Location</span>
+            <Navigation2 className="w-6 h-6" />
+            <span className="text-xs">Trips</span>
           </Button>
 
           <Button
             onClick={() => setShowListDrawer(true)}
             variant="ghost"
-            className="flex flex-col items-center gap-1 h-auto py-2 px-4 text-slate-300 hover:text-emerald-400 hover:bg-transparent transition-colors"
+            className="flex flex-col items-center gap-1 h-auto py-2 px-3 text-slate-300 hover:text-emerald-400 hover:bg-transparent transition-colors"
             data-testid="nav-alarms-btn"
           >
             <Bell className="w-6 h-6" />
             <span className="text-xs">Alarms</span>
           </Button>
 
-          <Button
-            onClick={handleAddAlarm}
-            className="w-14 h-14 -mt-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-transform active:scale-95"
-            data-testid="nav-add-btn"
-          >
-            <Plus className="w-7 h-7" />
-          </Button>
+          <div className="relative">
+            <Button
+              onClick={handleAddAlarm}
+              className="w-14 h-14 -mt-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)] transition-transform active:scale-95"
+              data-testid="nav-add-btn"
+            >
+              <Plus className="w-7 h-7" />
+            </Button>
+            <Button
+              onClick={handleAddTrip}
+              className="absolute -top-2 -right-1 w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-transform active:scale-95"
+              data-testid="nav-add-trip-btn"
+            >
+              <Navigation2 className="w-4 h-4" />
+            </Button>
+          </div>
 
           <Button
             onClick={() => setShowHistoryDrawer(true)}
             variant="ghost"
-            className="flex flex-col items-center gap-1 h-auto py-2 px-4 text-slate-300 hover:text-emerald-400 hover:bg-transparent transition-colors"
+            className="flex flex-col items-center gap-1 h-auto py-2 px-3 text-slate-300 hover:text-emerald-400 hover:bg-transparent transition-colors"
             data-testid="nav-history-btn"
           >
             <History className="w-6 h-6" />
@@ -483,13 +492,13 @@ const MapView = () => {
           </Button>
 
           <Button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={centerOnUser}
             variant="ghost"
-            className="flex flex-col items-center gap-1 h-auto py-2 px-4 text-slate-300 hover:text-emerald-400 hover:bg-transparent transition-colors"
-            data-testid="nav-map-btn"
+            className="flex flex-col items-center gap-1 h-auto py-2 px-3 text-slate-300 hover:text-emerald-400 hover:bg-transparent transition-colors"
+            data-testid="nav-location-btn"
           >
             <MapPin className="w-6 h-6" />
-            <span className="text-xs">Map</span>
+            <span className="text-xs">Location</span>
           </Button>
         </div>
       </div>
