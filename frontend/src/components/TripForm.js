@@ -37,19 +37,81 @@ const TripForm = ({ onClose, prefillData = null }) => {
     }
   }, [prefillData]);
 
-  const parseSharedTripData = (text) => {
+  const parseSharedTripData = async (text) => {
     if (!text) return;
 
-    // Simple parsing - extract destination
+    // Parse trip details
     const match = text.match(/to ([A-Za-z\s]+)/i);
     if (match) {
       const destination = match[1].trim();
       setTripName(`Trip to ${destination}`);
-      toast.success('Trip details detected from Android!', {
-        description: `Destination: ${destination}`,
-        icon: <Sparkles className="w-4 h-4" />
-      });
+      
+      // Auto-suggest route waypoints based on destination
+      const suggested = suggestRouteWaypoints(destination);
+      
+      if (suggested && suggested.length > 0) {
+        setWaypoints(suggested);
+        
+        // Auto-search for each waypoint
+        suggested.forEach((wp, index) => {
+          setTimeout(() => searchPlace(wp.searchQuery, index), index * 1000);
+        });
+        
+        toast.success('Trip auto-configured from notification!', {
+          description: `${suggested.length} stops suggested along the route`,
+          icon: <Sparkles className="w-4 h-4" />
+        });
+      } else {
+        toast.success('Trip details detected from Android!', {
+          description: `Destination: ${destination}`,
+          icon: <Sparkles className="w-4 h-4" />
+        });
+      }
     }
+  };
+
+  const suggestRouteWaypoints = (destination) => {
+    // Common routes with pre-configured waypoints
+    const routes = {
+      'hyderabad': [
+        { name: 'Bangalore Start', type: 'start', searchQuery: 'Bangalore, Karnataka, India' },
+        { name: 'Devanahalli (Dinner)', type: 'meal', searchQuery: 'Devanahalli, Bangalore, Karnataka' },
+        { name: 'Kurnool (Rest)', type: 'rest', searchQuery: 'Kurnool, Andhra Pradesh, India' },
+        { name: 'Hyderabad', type: 'destination', searchQuery: 'Hyderabad, Telangana, India' }
+      ],
+      'mumbai': [
+        { name: 'Bangalore Start', type: 'start', searchQuery: 'Bangalore, Karnataka, India' },
+        { name: 'Hubli (Lunch)', type: 'meal', searchQuery: 'Hubli, Karnataka, India' },
+        { name: 'Belgaum (Rest)', type: 'rest', searchQuery: 'Belgaum, Karnataka, India' },
+        { name: 'Mumbai', type: 'destination', searchQuery: 'Mumbai, Maharashtra, India' }
+      ],
+      'chennai': [
+        { name: 'Bangalore Start', type: 'start', searchQuery: 'Bangalore, Karnataka, India' },
+        { name: 'Hosur', type: 'stop', searchQuery: 'Hosur, Tamil Nadu, India' },
+        { name: 'Chennai', type: 'destination', searchQuery: 'Chennai, Tamil Nadu, India' }
+      ]
+    };
+
+    const destLower = destination.toLowerCase();
+    
+    // Find matching route
+    for (const [key, routeWaypoints] of Object.entries(routes)) {
+      if (destLower.includes(key)) {
+        return routeWaypoints.map(wp => ({
+          name: wp.name,
+          type: wp.type,
+          latitude: '',
+          longitude: '',
+          radius: 500,
+          searchQuery: wp.searchQuery,
+          searchResults: [],
+          isSearching: false,
+          showResults: false
+        }));
+      }
+    }
+    
+    return null;
   };
 
   const copyShareInstructions = () => {
