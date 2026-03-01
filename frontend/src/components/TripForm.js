@@ -61,6 +61,21 @@ const TripForm = ({ onClose, prefillData = null, editTrip = null, editAlarms = n
     }
   }, [prefillData, editTrip, editAlarms]);
 
+  // Auto-generate trip name from waypoints
+  useEffect(() => {
+    if (waypoints.length >= 2 && !editTrip) {
+      const firstStop = waypoints[0].name || waypoints[0].searchQuery.split(',')[0];
+      const lastStop = waypoints[waypoints.length - 1].name || waypoints[waypoints.length - 1].searchQuery.split(',')[0];
+      
+      if (firstStop && lastStop && firstStop !== lastStop) {
+        const autoName = `${firstStop} to ${lastStop}`;
+        if (tripName !== autoName) {
+          setTripName(autoName);
+        }
+      }
+    }
+  }, [waypoints, editTrip, tripName]);
+
   const parseSharedTripData = async (text) => {
     if (!text) return;
 
