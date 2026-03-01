@@ -319,7 +319,7 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
             </div>
 
             <Button onClick={confirmStop} className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3" data-testid="builder-confirm-btn">
-              {isFirst ? 'Set Destination' : isNew ? 'Add Waypoint' : 'Update'}
+              {isAskingStart ? 'Set Start' : isAskingDest ? 'Set Destination' : isNew ? 'Add Waypoint' : 'Update'}
             </Button>
           </>
         )}
