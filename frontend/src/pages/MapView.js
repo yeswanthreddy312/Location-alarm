@@ -630,7 +630,7 @@ const MapView = () => {
             </p>
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto pb-20">
               <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mb-6" />
-              <TripList />
+              <TripList onEditTrip={handleEditTrip} />
             </div>
           </Drawer.Content>
         </Drawer.Portal>
