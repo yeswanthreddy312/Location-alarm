@@ -122,8 +122,20 @@ const MapView = () => {
     fetchAlarms();
   }, []);
 
-  // Get user's current location
+  // Check for shared notification data
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedText = urlParams.get('text') || urlParams.get('title');
+    
+    if (sharedText && sharedText.match(/trip to|travel to|going to/i)) {
+      setNotificationData(sharedText);
+      setAddMode('notification');
+      setShowAddDrawer(true);
+      
+      // Clear URL params
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
