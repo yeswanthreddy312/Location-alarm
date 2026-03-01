@@ -115,8 +115,8 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!name || !latitude || !longitude) {
-      toast.error('Please fill all required fields');
+    if (!latitude || !longitude) {
+      toast.error('Please select a location first');
       return;
     }
 
@@ -131,8 +131,11 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
     setIsSubmitting(true);
 
     try {
+      // Use location name as fallback if name is empty
+      const alarmName = name || searchQuery.split(',')[0] || 'Location Alarm';
+      
       const alarmData = {
-        name,
+        name: alarmName,
         latitude: lat,
         longitude: lng,
         radius: radius[0],
