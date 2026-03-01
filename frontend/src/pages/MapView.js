@@ -115,12 +115,10 @@ const MapView = () => {
     setShowBuilder(true);
   }, [tripAlarms]);
 
-  const deleteTripFromPreview = useCallback(async (tripId) => {
-    try {
-      await axios.delete(`${API}/trips/${tripId}`);
-      fetchTrips();
-      fetchAlarms();
-    } catch {}
+  const deleteTripFromPreview = useCallback((tripId) => {
+    storage.deleteTrip(tripId);
+    fetchTrips();
+    fetchAlarms();
   }, [fetchTrips, fetchAlarms]);
 
   const handleAdd = useCallback(() => {
