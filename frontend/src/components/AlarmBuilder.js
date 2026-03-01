@@ -339,17 +339,9 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
 
       {/* Trip visual */}
       <div className="py-2">
-        {/* Start marker */}
-        <div className="flex items-center gap-3 py-2">
-          <div className="w-3 h-3 rounded-full bg-slate-500 ring-2 ring-slate-500/20 ml-0.5" />
-          <span className="text-sm text-slate-400 flex-1">Your Location</span>
-          <span className="text-xs text-slate-600">Start</span>
-        </div>
-
         {stops.map((stop, i) => (
           <React.Fragment key={i}>
-            {/* Connecting line */}
-            <div className="ml-[7px] h-5 border-l-2 border-dashed border-slate-700" />
+            {i > 0 && <div className="ml-[7px] h-5 border-l-2 border-dashed border-slate-700" />}
 
             {/* Stop row — tappable */}
             <div
@@ -361,18 +353,22 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
               data-testid={`stop-row-${i}`}
             >
               <div className={`w-3 h-3 rounded-full ml-0.5 ${
-                stop.type === 'destination' ? 'bg-emerald-500 ring-2 ring-emerald-500/20' : 'bg-amber-500 ring-2 ring-amber-500/20'
+                stop.type === 'start' ? 'bg-slate-400 ring-2 ring-slate-400/20' :
+                stop.type === 'destination' ? 'bg-emerald-500 ring-2 ring-emerald-500/20' :
+                'bg-amber-500 ring-2 ring-amber-500/20'
               }`} />
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{stop.name}</p>
-                <p className="text-[11px] text-slate-500">{stop.type === 'destination' ? 'Destination' : 'Waypoint'}</p>
+                <p className="text-[11px] text-slate-500">
+                  {stop.type === 'start' ? 'Start' : stop.type === 'destination' ? 'Destination' : 'Waypoint'}
+                </p>
               </div>
               <span className={`text-xs px-2 py-1 rounded font-medium ${
                 stop.triggerMode === 'time' ? 'bg-blue-500/15 text-blue-400' : 'bg-emerald-500/15 text-emerald-400'
               }`}>
                 {fmtAlarm(stop)}
               </span>
-              {stops.length > 1 && (
+              {stop.type === 'stop' && (
                 <button
                   onClick={(e) => { e.stopPropagation(); removeStop(i); }}
                   className="text-slate-600 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
