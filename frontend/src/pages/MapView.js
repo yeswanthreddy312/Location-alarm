@@ -127,7 +127,10 @@ const MapView = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const sharedText = urlParams.get('text') || urlParams.get('title');
     
+    console.log('Checking URL params:', sharedText);
+    
     if (sharedText && sharedText.match(/trip to|travel to|going to/i)) {
+      console.log('Notification detected:', sharedText);
       setNotificationData(sharedText);
       setAddMode('notification');
       setShowAddDrawer(true);
