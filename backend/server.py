@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,7 +6,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
@@ -27,44 +27,125 @@ api_router = APIRouter(prefix="/api")
 
 
 # Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+class AlarmCreate(BaseModel):
+    name: str
+    latitude: float
+    longitude: float
+    radius: int = Field(default=500, description="Radius in meters")
+    sound: str = Field(default="default")
+    is_active: bool = Field(default=True)
+    recurring: bool = Field(default=False)
+
+class Alarm(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    name: str
+    latitude: float
+    longitude: float
+    radius: int
+    sound: str
+    is_active: bool
+    recurring: bool
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    triggered_at: Optional[datetime] = None
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class AlarmUpdate(BaseModel):
+    name: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    radius: Optional[int] = None
+    sound: Optional[str] = None
+    is_active: Optional[bool] = None
+    recurring: Optional[bool] = None
+    triggered_at: Optional[datetime] = None
 
-# Add your routes to the router instead of directly to app
+
+# Alarm Routes
+@api_router.post("/alarms", response_model=Alarm)
+async def create_alarm(alarm_input: AlarmCreate):
+    """Create a new location alarm"""
+    alarm_dict = alarm_input.model_dump()
+    alarm_obj = Alarm(**alarm_dict)
+    
+    doc = alarm_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    if doc.get('triggered_at'):
+        doc['triggered_at'] = doc['triggered_at'].isoformat()
+    
+    await db.alarms.insert_one(doc)
+    return alarm_obj
+
+@api_router.get("/alarms", response_model=List[Alarm])
+async def get_alarms():
+    """Get all location alarms"""
+    alarms = await db.alarms.find({}, {"_id": 0}).to_list(1000)
+    
+    for alarm in alarms:
+        if isinstance(alarm['created_at'], str):
+            alarm['created_at'] = datetime.fromisoformat(alarm['created_at'])
+        if alarm.get('triggered_at') and isinstance(alarm['triggered_at'], str):
+            alarm['triggered_at'] = datetime.fromisoformat(alarm['triggered_at'])
+    
+    return alarms
+
+@api_router.get("/alarms/{alarm_id}", response_model=Alarm)
+async def get_alarm(alarm_id: str):
+    """Get a specific alarm by ID"""
+    alarm = await db.alarms.find_one({"id": alarm_id}, {"_id": 0})
+    
+    if not alarm:
+        raise HTTPException(status_code=404, detail="Alarm not found")
+    
+    if isinstance(alarm['created_at'], str):
+        alarm['created_at'] = datetime.fromisoformat(alarm['created_at'])
+    if alarm.get('triggered_at') and isinstance(alarm['triggered_at'], str):
+        alarm['triggered_at'] = datetime.fromisoformat(alarm['triggered_at'])
+    
+    return alarm
+
+@api_router.put("/alarms/{alarm_id}", response_model=Alarm)
+async def update_alarm(alarm_id: str, alarm_update: AlarmUpdate):
+    """Update an existing alarm"""
+    update_data = {k: v for k, v in alarm_update.model_dump().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No update data provided")
+    
+    if 'triggered_at' in update_data and update_data['triggered_at']:
+        update_data['triggered_at'] = update_data['triggered_at'].isoformat()
+    
+    result = await db.alarms.update_one(
+        {"id": alarm_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Alarm not found")
+    
+    updated_alarm = await db.alarms.find_one({"id": alarm_id}, {"_id": 0})
+    
+    if isinstance(updated_alarm['created_at'], str):
+        updated_alarm['created_at'] = datetime.fromisoformat(updated_alarm['created_at'])
+    if updated_alarm.get('triggered_at') and isinstance(updated_alarm['triggered_at'], str):
+        updated_alarm['triggered_at'] = datetime.fromisoformat(updated_alarm['triggered_at'])
+    
+    return updated_alarm
+
+@api_router.delete("/alarms/{alarm_id}")
+async def delete_alarm(alarm_id: str):
+    """Delete an alarm"""
+    result = await db.alarms.delete_one({"id": alarm_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Alarm not found")
+    
+    return {"message": "Alarm deleted successfully"}
+
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+    return {"message": "Location Alarm API"}
 
 # Include the router in the main app
 app.include_router(api_router)
