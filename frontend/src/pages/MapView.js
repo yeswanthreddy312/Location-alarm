@@ -611,6 +611,7 @@ const MapView = () => {
                     editTrip={editingTrip}
                     editAlarms={editingTripAlarms}
                     prefillData={notificationData}
+                    userLocation={userLocation}
                   />
                 )}
               </div>
