@@ -62,13 +62,19 @@ const AlarmList = ({ alarms, onEdit, onDelete, onToggle }) => {
               />
             </div>
 
-            <div className="flex items-center gap-4 text-xs text-slate-400 mb-3">
-              <span className="px-2 py-1 bg-slate-700/50 rounded-md">
-                📍 {alarm.radius}m radius
-              </span>
+            <div className="flex items-center gap-2 flex-wrap text-xs text-slate-400 mb-3">
+              {alarm.trigger_mode === 'time' ? (
+                <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-md">
+                  {alarm.trigger_time} min before
+                </span>
+              ) : (
+                <span className="px-2 py-1 bg-slate-700/50 rounded-md">
+                  {alarm.radius}m radius
+                </span>
+              )}
               {alarm.recurring && (
                 <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded-md">
-                  🔁 Recurring
+                  Recurring
                 </span>
               )}
             </div>
