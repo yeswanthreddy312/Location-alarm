@@ -60,6 +60,22 @@ class AlarmUpdate(BaseModel):
     recurring: Optional[bool] = None
     triggered_at: Optional[datetime] = None
 
+class AlarmHistoryCreate(BaseModel):
+    alarm_id: str
+    alarm_name: str
+    latitude: float
+    longitude: float
+
+class AlarmHistory(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    alarm_id: str
+    alarm_name: str
+    latitude: float
+    longitude: float
+    triggered_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 
 # Alarm Routes
 @api_router.post("/alarms", response_model=Alarm)
@@ -141,6 +157,47 @@ async def delete_alarm(alarm_id: str):
         raise HTTPException(status_code=404, detail="Alarm not found")
     
     return {"message": "Alarm deleted successfully"}
+
+
+# Alarm History Routes
+@api_router.post("/alarm-history", response_model=AlarmHistory)
+async def log_alarm_trigger(history_input: AlarmHistoryCreate):
+    """Log when an alarm is triggered"""
+    history_obj = AlarmHistory(**history_input.model_dump())
+    
+    doc = history_obj.model_dump()
+    doc['triggered_at'] = doc['triggered_at'].isoformat()
+    
+    await db.alarm_history.insert_one(doc)
+    return history_obj
+
+@api_router.get("/alarm-history", response_model=List[AlarmHistory])
+async def get_alarm_history(limit: int = 50):
+    """Get alarm trigger history"""
+    history = await db.alarm_history.find(
+        {}, 
+        {"_id": 0}
+    ).sort("triggered_at", -1).limit(limit).to_list(limit)
+    
+    for record in history:
+        if isinstance(record['triggered_at'], str):
+            record['triggered_at'] = datetime.fromisoformat(record['triggered_at'])
+    
+    return history
+
+@api_router.get("/alarm-history/{alarm_id}", response_model=List[AlarmHistory])
+async def get_alarm_history_by_id(alarm_id: str):
+    """Get trigger history for a specific alarm"""
+    history = await db.alarm_history.find(
+        {"alarm_id": alarm_id}, 
+        {"_id": 0}
+    ).sort("triggered_at", -1).to_list(100)
+    
+    for record in history:
+        if isinstance(record['triggered_at'], str):
+            record['triggered_at'] = datetime.fromisoformat(record['triggered_at'])
+    
+    return history
 
 
 @api_router.get("/")
