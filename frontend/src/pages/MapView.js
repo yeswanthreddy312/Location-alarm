@@ -87,8 +87,8 @@ const MapView = () => {
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [showListDrawer, setShowListDrawer] = useState(false);
   const [showHistoryDrawer, setShowHistoryDrawer] = useState(false);
-  const [showTripForm, setShowTripForm] = useState(false);
   const [showTripList, setShowTripList] = useState(false);
+  const [addMode, setAddMode] = useState('alarm'); // 'alarm' or 'trip'
   const [selectedAlarm, setSelectedAlarm] = useState(null);
   const [tempMarker, setTempMarker] = useState(null);
   const [mapCenter, setMapCenter] = useState([28.6139, 77.2090]);
