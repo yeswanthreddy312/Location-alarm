@@ -362,18 +362,7 @@ Or copy trip details and paste here.`;
                 </select>
               </div>
 
-              {/* Waypoint Name */}
-              <div className="space-y-2">
-                <Label className="text-slate-300 text-xs">Name</Label>
-                <Input
-                  value={waypoint.name}
-                  onChange={(e) => updateWaypoint(index, { name: e.target.value })}
-                  placeholder="e.g., Devanahalli, Kurnool"
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 text-sm"
-                />
-              </div>
-
-              {/* Search Location */}
+              {/* Search Location - PRIMARY */}
               <div className="space-y-2">
                 <Label className="text-slate-300 text-xs">Search Location</Label>
                 <div className="relative">
@@ -411,6 +400,22 @@ Or copy trip details and paste here.`;
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Waypoint Name - SECONDARY (auto-filled) */}
+              <div className="space-y-2">
+                <Label className="text-slate-300 text-xs">
+                  Name <span className="text-slate-500">(auto-filled)</span>
+                </Label>
+                <Input
+                  value={waypoint.name}
+                  onChange={(e) => updateWaypoint(index, { name: e.target.value })}
+                  placeholder="Will be set from location"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 text-sm"
+                />
+                <p className="text-xs text-slate-500">
+                  Auto-filled from location. Edit if needed.
+                </p>
               </div>
 
               {/* Selected Coordinates */}
