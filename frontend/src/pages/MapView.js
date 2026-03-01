@@ -490,28 +490,66 @@ const MapView = () => {
         </div>
       </div>
 
-      {/* Add/Edit Alarm Drawer */}
+      {/* Add/Edit Alarm/Trip Drawer with Tabs */}
       <Drawer.Root open={showAddDrawer} onOpenChange={setShowAddDrawer}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
           <Drawer.Content 
-            className="bg-slate-900 flex flex-col rounded-t-[24px] h-[85vh] mt-24 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10"
-            aria-describedby="add-alarm-desc"
+            className="bg-slate-900 flex flex-col rounded-t-[24px] h-[90vh] mt-12 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10"
+            aria-describedby="add-desc"
           >
             <Drawer.Title className="sr-only">
-              {selectedAlarm ? 'Edit Alarm' : 'New Alarm'}
+              {addMode === 'alarm' ? 'Add Alarm' : 'Plan Trip'}
             </Drawer.Title>
-            <p id="add-alarm-desc" className="sr-only">
-              Set a location-based alarm for your trip
+            <p id="add-desc" className="sr-only">
+              {addMode === 'alarm' ? 'Create a single location alarm' : 'Plan a trip with multiple stops'}
             </p>
-            <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto">
-              <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mb-6" />
-              <AlarmForm
-                alarm={selectedAlarm}
-                userLocation={userLocation}
-                tempMarker={tempMarker}
-                onClose={handleFormClose}
-              />
+            <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto flex flex-col">
+              <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mb-4" />
+              
+              {/* Mode Tabs */}
+              <div className="flex gap-2 mb-6">
+                <Button
+                  type="button"
+                  onClick={() => setAddMode('alarm')}
+                  className={`flex-1 py-3 rounded-lg transition-all ${
+                    addMode === 'alarm'
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                  }`}
+                  data-testid="tab-single-alarm"
+                >
+                  <Bell className="w-4 h-4 mr-2 inline" />
+                  Single Alarm
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => setAddMode('trip')}
+                  className={`flex-1 py-3 rounded-lg transition-all ${
+                    addMode === 'trip'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                  }`}
+                  data-testid="tab-plan-trip"
+                >
+                  <Navigation2 className="w-4 h-4 mr-2 inline" />
+                  Plan Trip
+                </Button>
+              </div>
+
+              {/* Content based on mode */}
+              <div className="flex-1 overflow-y-auto">
+                {addMode === 'alarm' ? (
+                  <AlarmForm
+                    alarm={selectedAlarm}
+                    userLocation={userLocation}
+                    tempMarker={tempMarker}
+                    onClose={handleFormClose}
+                  />
+                ) : (
+                  <TripForm onClose={handleFormClose} />
+                )}
+              </div>
             </div>
           </Drawer.Content>
         </Drawer.Portal>
