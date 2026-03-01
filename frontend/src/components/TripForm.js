@@ -22,7 +22,7 @@ const TripForm = ({ onClose, editTrip = null, editAlarms = null, userLocation = 
   const [tripName, setTripName] = useState('');
   const [description, setDescription] = useState('');
   const [waypoints, setWaypoints] = useState([
-    { name: '', type: 'start', latitude: '', longitude: '', radius: 500, searchQuery: '', searchResults: [], isSearching: false, showResults: false },
+    { name: '', type: 'start', latitude: '', longitude: '', radius: 500, triggerMode: 'distance', triggerTime: 30, searchQuery: '', searchResults: [], isSearching: false, showResults: false },
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const searchTimeoutRef = useRef(null);
