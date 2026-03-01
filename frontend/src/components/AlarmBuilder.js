@@ -168,7 +168,8 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
     if (stops.length === 0) { toast.error('Add a destination'); return; }
     setIsSubmitting(true);
     try {
-      if (stops.length === 1) {
+      if (stops.length === 1 && !stops[0].trip_id) {
+        // Single alarm edit (no start)
         const s = stops[0];
         const data = {
           name: s.name, latitude: s.lat, longitude: s.lng, radius: s.radius,
@@ -180,8 +181,11 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
         else await axios.post(`${API}/alarms`, data);
         toast.success(editAlarm ? 'Alarm updated' : 'Alarm created');
       } else {
-        const tripName = `${stops[0].name} to ${stops[stops.length - 1].name}`;
-        const tripData = { name: tripName, description: null, start_location: stops[0].name, end_location: stops[stops.length - 1].name };
+        // Trip (start + destination + optional waypoints)
+        const startName = stops[0].name;
+        const destName = stops[stops.length - 1].name;
+        const tripName = `${startName} to ${destName}`;
+        const tripData = { name: tripName, description: null, start_location: startName, end_location: destName };
         let tripId;
         if (editTrip) {
           await axios.put(`${API}/trips/${editTrip.id}`, tripData);
