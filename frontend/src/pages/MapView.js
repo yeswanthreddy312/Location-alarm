@@ -399,8 +399,8 @@ const MapView = () => {
         </div>
       </div>
 
-      {/* FAB Buttons - Fixed Position */}
-      <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-3 items-end pointer-events-auto">
+      {/* FAB Buttons - Fixed Position on LEFT to avoid Emergent badge */}
+      <div className="fixed bottom-20 left-4 z-50 flex flex-col gap-3 items-start pointer-events-auto">
         {/* Center on User Button */}
         <Button
           onClick={centerOnUser}
