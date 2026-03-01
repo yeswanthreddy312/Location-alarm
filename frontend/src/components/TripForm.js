@@ -174,14 +174,16 @@ Or copy trip details and paste here.`;
 
     updateWaypoint(index, { isSearching: true });
     try {
-      // Use backend proxy to bypass CORS restrictions
-      const response = await axios.get(`${API}/geocode`, {
-        params: { q: query }
-      });
-      
-      if (response.data.success && response.data.place) {
-        // Format as array for consistency
-        updateWaypoint(index, { searchResults: [response.data.place], showResults: true });
+      const params = { q: query, limit: 5 };
+      if (userLocation) {
+        params.lat = userLocation.lat;
+        params.lon = userLocation.lng;
+      }
+
+      const response = await axios.get(`${API}/geocode`, { params });
+
+      if (response.data.success && response.data.results) {
+        updateWaypoint(index, { searchResults: response.data.results, showResults: true });
       } else {
         updateWaypoint(index, { searchResults: [] });
       }
