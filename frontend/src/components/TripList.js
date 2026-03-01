@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Navigation2, Trash2, MapPin, ChevronRight, Circle, CheckCircle2 } from 'lucide-react';
+import { Navigation2, Trash2, MapPin, ChevronRight, Circle, CheckCircle2, Edit } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
