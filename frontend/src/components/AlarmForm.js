@@ -85,11 +85,13 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
     setLongitude(place.lon);
     setSearchQuery(place.display_name);
     setShowResults(false);
+    
+    // Auto-fill alarm name from location
     if (!name) {
-      // Auto-fill name with first part of address
-      const placeName = place.display_name.split(',')[0];
-      setName(placeName);
+      const locationName = place.display_name.split(',')[0];
+      setName(locationName);
     }
+    
     toast.success('Location selected');
   };
 
