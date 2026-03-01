@@ -127,7 +127,7 @@ const MapView = () => {
   }, []);
 
   return (
-    <div className="flex flex-col bg-slate-950" style={{ height: '100dvh' }}>
+    <div className="flex flex-col bg-slate-950 app-shell">
       {/* Map Section */}
       <div className="relative" style={{ height: '42vh', minHeight: '240px' }}>
         <MapContainer center={mapCenter} zoom={13} className="h-full w-full" zoomControl={false}>
@@ -288,7 +288,7 @@ const MapView = () => {
       <Drawer.Root open={showBuilder} onOpenChange={setShowBuilder}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10" style={{ height: '85dvh', maxHeight: '85dvh' }} aria-describedby="builder-desc">
+          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 drawer-tall" aria-describedby="builder-desc">
             <Drawer.Title className="sr-only">Alarm Builder</Drawer.Title>
             <p id="builder-desc" className="sr-only">Create or edit</p>
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto">
@@ -303,7 +303,7 @@ const MapView = () => {
       <Drawer.Root open={showListDrawer} onOpenChange={setShowListDrawer}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10" style={{ height: '70dvh', maxHeight: '70dvh' }} aria-describedby="list-desc">
+          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 drawer-medium" aria-describedby="list-desc">
             <Drawer.Title className="sr-only">Alarms</Drawer.Title>
             <p id="list-desc" className="sr-only">Manage alarms</p>
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto pb-20">
@@ -318,7 +318,7 @@ const MapView = () => {
       <Drawer.Root open={showHistoryDrawer} onOpenChange={setShowHistoryDrawer}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10" style={{ height: '70dvh', maxHeight: '70dvh' }} aria-describedby="hist-desc">
+          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 drawer-medium" aria-describedby="hist-desc">
             <Drawer.Title className="sr-only">History</Drawer.Title>
             <p id="hist-desc" className="sr-only">Triggered alarms</p>
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto pb-20">
@@ -333,7 +333,7 @@ const MapView = () => {
       <Drawer.Root open={showTripList} onOpenChange={setShowTripList}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10" style={{ height: '70dvh', maxHeight: '70dvh' }} aria-describedby="trip-desc">
+          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 drawer-medium" aria-describedby="trip-desc">
             <Drawer.Title className="sr-only">Trips</Drawer.Title>
             <p id="trip-desc" className="sr-only">Manage trips</p>
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto pb-20">
