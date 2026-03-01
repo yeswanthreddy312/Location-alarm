@@ -136,6 +136,27 @@ const MapView = () => {
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
+
+  // Get user's current location
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setUserLocation(location);
+          setMapCenter([location.lat, location.lng]);
+          toast.success('Location access granted');
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
