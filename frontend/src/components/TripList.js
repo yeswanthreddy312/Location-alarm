@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const TripList = ({ onSelectTrip }) => {
+const TripList = ({ onSelectTrip, onEditTrip }) => {
   const [trips, setTrips] = useState([]);
   const [tripAlarms, setTripAlarms] = useState({});
   const [loading, setLoading] = useState(true);
