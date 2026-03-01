@@ -174,8 +174,8 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
           trigger_mode: s.triggerMode,
           trigger_time: s.triggerMode === 'time' ? s.triggerTime : null,
         };
-        if (editAlarm) await axios.put(`${API}/alarms/${editAlarm.id}`, data);
-        else await axios.post(`${API}/alarms`, data);
+        if (editAlarm) storage.updateAlarm(editAlarm.id, data);
+        else storage.addAlarm(data);
         toast.success(editAlarm ? 'Alarm updated' : 'Alarm created');
       } else {
         // Trip (start + destination + optional waypoints)
@@ -185,22 +185,21 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
         const tripData = { name: tripName, description: null, start_location: startName, end_location: destName };
         let tripId;
         if (editTrip) {
-          await axios.put(`${API}/trips/${editTrip.id}`, tripData);
+          storage.updateTrip(editTrip.id, tripData);
           tripId = editTrip.id;
-          if (editTripAlarms?.length) for (const a of editTripAlarms) await axios.delete(`${API}/alarms/${a.id}`);
+          if (editTripAlarms?.length) editTripAlarms.forEach(a => storage.deleteAlarm(a.id));
         } else {
-          tripId = (await axios.post(`${API}/trips`, tripData)).data.id;
+          tripId = storage.addTrip(tripData).id;
         }
-        for (let i = 0; i < stops.length; i++) {
-          const s = stops[i];
-          await axios.post(`${API}/alarms`, {
+        stops.forEach((s, i) => {
+          storage.addAlarm({
             name: s.name, latitude: s.lat, longitude: s.lng, radius: s.radius,
             sound: 'default', is_active: true, recurring: false,
             trip_id: tripId, sequence: i + 1, waypoint_type: s.type,
             trigger_mode: s.triggerMode,
             trigger_time: s.triggerMode === 'time' ? s.triggerTime : null,
           });
-        }
+        });
         toast.success(editTrip ? 'Trip updated' : `Trip with ${stops.length} stops created`);
       }
       onClose();
