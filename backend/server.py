@@ -319,10 +319,11 @@ async def get_alarm_history_by_id(alarm_id: str):
 
 
 @api_router.get("/geocode")
-async def geocode_place(q: str):
+async def geocode_place(q: str, limit: int = 5):
     """
     Geocode a place name using OpenStreetMap Nominatim
     Acts as a proxy to bypass browser CORS restrictions
+    Returns multiple results for better search experience
     """
     try:
         async with httpx.AsyncClient() as client:
@@ -331,7 +332,9 @@ async def geocode_place(q: str):
                 params={
                     "format": "json",
                     "q": q,
-                    "limit": 1
+                    "limit": limit,
+                    "addressdetails": 1,
+                    "countrycodes": "in"  # Focus on India for better local results
                 },
                 headers={
                     "User-Agent": "LocationAlarmApp/1.0"
@@ -344,12 +347,12 @@ async def geocode_place(q: str):
                 if data and len(data) > 0:
                     return {
                         "success": True,
-                        "place": data[0]
+                        "results": data  # Return all results, not just first
                     }
                 else:
                     return {
                         "success": False,
-                        "error": "Location not found"
+                        "error": "No locations found. Try being more specific."
                     }
             else:
                 raise HTTPException(status_code=response.status_code, detail="Geocoding service error")
@@ -358,7 +361,7 @@ async def geocode_place(q: str):
         raise HTTPException(status_code=504, detail="Geocoding service timeout")
     except Exception as e:
         logger.error(f"Geocoding error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to geocode location")
+        raise HTTPException(status_code=500, detail="Failed to search location")
 
 
 @api_router.get("/")
