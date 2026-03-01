@@ -305,7 +305,12 @@ const MapView = () => {
 
   const handleAddAlarm = () => {
     setSelectedAlarm(null);
+    setShowTripForm(false);
     setShowAddDrawer(true);
+  };
+
+  const handleAddTrip = () => {
+    setShowTripForm(true);
   };
 
   const handleEditAlarm = (alarm) => {
