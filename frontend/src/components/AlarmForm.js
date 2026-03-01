@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,8 +8,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import { MapPin, Save, Search, Loader2 } from 'lucide-react';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
   const [name, setName] = useState('');
@@ -23,6 +22,7 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
   const [isActive, setIsActive] = useState(true);
   const [recurring, setRecurring] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const searchTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (alarm) {
@@ -93,13 +93,8 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
-    // Debounce search
-    const timeoutId = setTimeout(() => {
-      searchPlace(query);
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => searchPlace(query), 500);
   };
 
   const selectPlace = (place) => {

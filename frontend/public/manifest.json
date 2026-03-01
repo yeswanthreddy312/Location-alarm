@@ -26,16 +26,6 @@
   "theme_color": "#020617",
   "background_color": "#020617",
   "orientation": "portrait",
-  "share_target": {
-    "action": "/share",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
   "shortcuts": [
     {
       "name": "Quick Alarm",
