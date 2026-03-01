@@ -170,21 +170,7 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Alarm Name */}
-        <div className="space-y-2">
-          <Label htmlFor="name" className="text-slate-200">Alarm Name</Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g., Home, Office, Airport"
-            className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-            data-testid="alarm-name-input"
-            required
-          />
-        </div>
-
-        {/* Place Search */}
+        {/* Search Location - PRIMARY */}
         <div className="space-y-3">
           <Label className="text-slate-200">Search Location</Label>
           <div className="relative">
@@ -245,6 +231,24 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
               Selected: {parseFloat(latitude).toFixed(4)}, {parseFloat(longitude).toFixed(4)}
             </div>
           )}
+        </div>
+
+        {/* Alarm Name - OPTIONAL/SECONDARY */}
+        <div className="space-y-2">
+          <Label htmlFor="name" className="text-slate-200">
+            Alarm Name <span className="text-xs text-slate-500">(auto-filled)</span>
+          </Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Will be set from location"
+            className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+            data-testid="alarm-name-input"
+          />
+          <p className="text-xs text-slate-500">
+            Name is automatically set from location. Edit if needed.
+          </p>
         </div>
 
         {/* Radius */}
