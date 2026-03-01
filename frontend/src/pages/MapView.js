@@ -82,9 +82,9 @@ const MapView = () => {
     setEditAlarm(null); setEditTrip(null); setEditTripAlarms(null);
     setShowBuilder(true);
     try {
-      const res = await axios.get(`${API}/reverse-geocode`, { params: { lat: latlng.lat, lon: latlng.lng } });
-      if (res.data.success) {
-        const addr = res.data.display_name;
+      const data = await reverseGeocode(latlng.lat, latlng.lng);
+      if (data.display_name) {
+        const addr = data.display_name;
         setTempMarker({ ...latlng, address: addr, name: addr.split(',')[0] });
       }
     } catch {}
