@@ -100,6 +100,12 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
       setLatitude(userLocation.lat.toString());
       setLongitude(userLocation.lng.toString());
       setSearchQuery('Current Location');
+      
+      // Auto-fill name if empty
+      if (!name) {
+        setName('Current Location');
+      }
+      
       toast.success('Using current location');
     } else {
       toast.error('Current location not available');
