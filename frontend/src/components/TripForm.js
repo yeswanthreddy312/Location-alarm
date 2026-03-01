@@ -360,38 +360,15 @@ Or copy trip details and paste here.`;
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Trip Name */}
-        <div className="space-y-2">
-          <Label htmlFor="tripName" className="text-slate-200">Trip Name</Label>
-          <Input
-            id="tripName"
-            value={tripName}
-            onChange={(e) => setTripName(e.target.value)}
-            placeholder="e.g., Bangalore to Hyderabad"
-            className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-            data-testid="trip-name-input"
-            required
-          />
-        </div>
-
-        {/* Description */}
-        <div className="space-y-2">
-          <Label htmlFor="description" className="text-slate-200">Description (Optional)</Label>
-          <Input
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Bus journey with meal stops"
-            className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-          />
-        </div>
-
-        {/* Waypoints */}
+        {/* Waypoints - PRIMARY FOCUS */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label className="text-slate-200">Trip Waypoints</Label>
+            <Label className="text-slate-200 text-lg font-semibold">Add Your Stops</Label>
             <span className="text-xs text-slate-400">{waypoints.length} stop{waypoints.length !== 1 ? 's' : ''}</span>
           </div>
+          <p className="text-sm text-slate-400">
+            Add waypoints for your journey. Trip name will be auto-generated.
+          </p>
 
           {waypoints.map((waypoint, index) => (
             <div key={index} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 space-y-3">
