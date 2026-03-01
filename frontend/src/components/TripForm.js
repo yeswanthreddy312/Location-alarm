@@ -228,16 +228,42 @@ Or copy trip details and paste here.`;
     setIsSubmitting(true);
 
     try {
-      const tripData = {
-        name: tripName,
-        description: description || null,
-        start_location: waypoints[0].name || waypoints[0].searchQuery,
-        end_location: waypoints[waypoints.length - 1].name || waypoints[waypoints.length - 1].searchQuery,
-      };
+      let tripId;
+      
+      if (editTrip) {
+        // Update existing trip
+        const tripData = {
+          name: tripName,
+          description: description || null,
+          start_location: waypoints[0].name || waypoints[0].searchQuery,
+          end_location: waypoints[waypoints.length - 1].name || waypoints[waypoints.length - 1].searchQuery,
+        };
+        
+        await axios.put(`${API}/trips/${editTrip.id}`, tripData);
+        tripId = editTrip.id;
+        
+        // Delete all existing alarms for this trip
+        if (editAlarms && editAlarms.length > 0) {
+          for (const alarm of editAlarms) {
+            await axios.delete(`${API}/alarms/${alarm.id}`);
+          }
+        }
+        
+        toast.info('Updating trip waypoints...');
+      } else {
+        // Create new trip
+        const tripData = {
+          name: tripName,
+          description: description || null,
+          start_location: waypoints[0].name || waypoints[0].searchQuery,
+          end_location: waypoints[waypoints.length - 1].name || waypoints[waypoints.length - 1].searchQuery,
+        };
 
-      const tripResponse = await axios.post(`${API}/trips`, tripData);
-      const tripId = tripResponse.data.id;
+        const tripResponse = await axios.post(`${API}/trips`, tripData);
+        tripId = tripResponse.data.id;
+      }
 
+      // Create new alarms for all waypoints
       for (let i = 0; i < waypoints.length; i++) {
         const waypoint = waypoints[i];
         const alarmData = {
@@ -255,11 +281,11 @@ Or copy trip details and paste here.`;
         await axios.post(`${API}/alarms`, alarmData);
       }
 
-      toast.success(`Trip "${tripName}" created with ${waypoints.length} waypoints!`);
+      toast.success(editTrip ? `Trip updated with ${waypoints.length} waypoints!` : `Trip "${tripName}" created with ${waypoints.length} waypoints!`);
       onClose();
     } catch (error) {
-      console.error('Error creating trip:', error);
-      toast.error('Failed to create trip');
+      console.error('Error saving trip:', error);
+      toast.error('Failed to save trip');
     } finally {
       setIsSubmitting(false);
     }
