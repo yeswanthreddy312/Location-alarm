@@ -482,6 +482,42 @@ Or copy trip details and paste here.`;
           </Button>
         </div>
 
+        {/* Auto-generated Trip Name (shown after waypoints) */}
+        {tripName && waypoints.length >= 2 && (
+          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-xs text-emerald-300 font-medium mb-1">
+                  Trip Name (Auto-generated)
+                </p>
+                <p className="text-lg font-semibold text-white mb-2" style={{ fontFamily: 'Manrope' }}>
+                  {tripName}
+                </p>
+                <details className="text-xs">
+                  <summary className="text-emerald-400 cursor-pointer hover:text-emerald-300">
+                    Edit trip name
+                  </summary>
+                  <div className="mt-3 space-y-2">
+                    <Input
+                      value={tripName}
+                      onChange={(e) => setTripName(e.target.value)}
+                      className="bg-slate-800 border-slate-700 text-white text-sm"
+                      placeholder="Custom trip name"
+                    />
+                    <Input
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="bg-slate-800 border-slate-700 text-white text-sm"
+                      placeholder="Add description (optional)"
+                    />
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Submit Buttons */}
         <div className="flex gap-3 pt-4">
           <Button
