@@ -394,7 +394,7 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
         </Button>
         <Button onClick={handleSave} disabled={isSubmitting} className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white" data-testid="builder-save-btn">
           <Save className="w-4 h-4 mr-2" />
-          {isSubmitting ? 'Saving...' : stops.length > 1 ? 'Save Trip' : 'Save Alarm'}
+          {isSubmitting ? 'Saving...' : 'Save Trip'}
         </Button>
       </div>
     </div>
