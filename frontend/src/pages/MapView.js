@@ -354,7 +354,13 @@ const MapView = () => {
     setAddMode('alarm');
     setEditingTrip(null);
     setEditingTripAlarms(null);
+    setNotificationData(null);
     fetchAlarms();
+  };
+
+  const handleAddWaypointsFromNotification = () => {
+    setAddMode('trip');
+    // TripForm will pick up the notification data
   };
 
   const handleEditTrip = (trip, alarms) => {
