@@ -92,6 +92,7 @@ const MapView = () => {
   const [addMode, setAddMode] = useState('alarm'); // 'alarm' or 'trip'
   const [editingTrip, setEditingTrip] = useState(null);
   const [editingTripAlarms, setEditingTripAlarms] = useState(null);
+  const [notificationData, setNotificationData] = useState(null);
   const [selectedAlarm, setSelectedAlarm] = useState(null);
   const [tempMarker, setTempMarker] = useState(null);
   const [mapCenter, setMapCenter] = useState([28.6139, 77.2090]);
