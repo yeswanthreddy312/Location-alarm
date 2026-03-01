@@ -539,35 +539,37 @@ const MapView = () => {
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto flex flex-col">
               <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mb-4" />
               
-              {/* Mode Tabs */}
-              <div className="flex gap-2 mb-6">
-                <Button
-                  type="button"
-                  onClick={() => setAddMode('alarm')}
-                  className={`flex-1 py-3 rounded-lg transition-all ${
-                    addMode === 'alarm'
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-                  }`}
-                  data-testid="tab-single-alarm"
-                >
-                  <Bell className="w-4 h-4 mr-2 inline" />
-                  Single Alarm
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => setAddMode('trip')}
-                  className={`flex-1 py-3 rounded-lg transition-all ${
-                    addMode === 'trip'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-                  }`}
-                  data-testid="tab-plan-trip"
-                >
-                  <Navigation2 className="w-4 h-4 mr-2 inline" />
-                  Plan Trip
-                </Button>
-              </div>
+              {/* Mode Tabs - Only show for manual creation */}
+              {addMode !== 'notification' && (
+                <div className="flex gap-2 mb-6">
+                  <Button
+                    type="button"
+                    onClick={() => setAddMode('alarm')}
+                    className={`flex-1 py-3 rounded-lg transition-all ${
+                      addMode === 'alarm'
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                    }`}
+                    data-testid="tab-single-alarm"
+                  >
+                    <Bell className="w-4 h-4 mr-2 inline" />
+                    Single Alarm
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => setAddMode('trip')}
+                    className={`flex-1 py-3 rounded-lg transition-all ${
+                      addMode === 'trip'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                    }`}
+                    data-testid="tab-plan-trip"
+                  >
+                    <Navigation2 className="w-4 h-4 mr-2 inline" />
+                    Plan Trip
+                  </Button>
+                </div>
+              )}
 
               {/* Content based on mode */}
               <div className="flex-1 overflow-y-auto">
