@@ -273,9 +273,11 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
           </div>
         )}
 
-        <Button type="button" onClick={useCurrentLocation} variant="outline" className="w-full bg-slate-800 border-slate-700 text-white hover:bg-slate-700" data-testid="builder-current-loc-btn">
-          <MapPin className="w-4 h-4 mr-2" />Use Current Location
-        </Button>
+        {isAskingStart && (
+          <Button type="button" onClick={useCurrentLocation} variant="outline" className="w-full bg-slate-800 border-slate-700 text-white hover:bg-slate-700" data-testid="builder-current-loc-btn">
+            <MapPin className="w-4 h-4 mr-2" />Use Current Location
+          </Button>
+        )}
 
         {/* Selected location info */}
         {form.lat && form.lng && (
