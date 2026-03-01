@@ -433,9 +433,18 @@ const MapView = () => {
       <Drawer.Root open={showAddDrawer} onOpenChange={setShowAddDrawer}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] h-[85vh] mt-24 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10">
+          <Drawer.Content 
+            className="bg-slate-900 flex flex-col rounded-t-[24px] h-[85vh] mt-24 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10"
+            aria-describedby="add-alarm-description"
+          >
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto">
               <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mb-6" />
+              <Drawer.Title className="sr-only">
+                {selectedAlarm ? 'Edit Alarm' : 'New Alarm'}
+              </Drawer.Title>
+              <Drawer.Description id="add-alarm-description" className="sr-only">
+                Set a location-based alarm for your trip
+              </Drawer.Description>
               <AlarmForm
                 alarm={selectedAlarm}
                 userLocation={userLocation}
@@ -450,9 +459,16 @@ const MapView = () => {
       <Drawer.Root open={showListDrawer} onOpenChange={setShowListDrawer}>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Drawer.Content className="bg-slate-900 flex flex-col rounded-t-[24px] h-[70vh] mt-24 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10">
+          <Drawer.Content 
+            className="bg-slate-900 flex flex-col rounded-t-[24px] h-[70vh] mt-24 fixed bottom-0 left-0 right-0 z-50 border-t border-white/10"
+            aria-describedby="alarm-list-description"
+          >
             <div className="p-4 bg-slate-900 rounded-t-[24px] flex-1 overflow-y-auto">
               <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-slate-700 mb-6" />
+              <Drawer.Title className="sr-only">Alarm List</Drawer.Title>
+              <Drawer.Description id="alarm-list-description" className="sr-only">
+                View and manage all your location alarms
+              </Drawer.Description>
               <AlarmList
                 alarms={alarms}
                 onEdit={handleEditAlarm}
