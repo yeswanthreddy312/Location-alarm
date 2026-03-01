@@ -5,7 +5,8 @@ import 'leaflet/dist/leaflet.css';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Drawer } from 'vaul';
-import axios from 'axios';
+import { storage } from '@/utils/storage';
+import { reverseGeocode } from '@/utils/geocode';
 import { useAlarms } from '@/hooks/useAlarms';
 import { useLocationTracking } from '@/hooks/useLocationTracking';
 import AlarmBuilder from '@/components/AlarmBuilder';
@@ -14,8 +15,6 @@ import AlarmHistory from '@/components/AlarmHistory';
 import TripList from '@/components/TripList';
 import BottomNav from '@/components/BottomNav';
 import { Bell, Navigation2, ChevronRight, Trash2, Edit, Plus, Clock, Ruler, Circle as CircleIcon, CheckCircle2 } from 'lucide-react';
-
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
