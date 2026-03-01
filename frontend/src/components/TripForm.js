@@ -113,7 +113,7 @@ const TripForm = ({ onClose, editTrip = null, editAlarms = null, userLocation = 
   const addWaypoint = () => {
     setWaypoints((prev) => [
       ...prev,
-      { name: '', type: 'stop', latitude: '', longitude: '', radius: 500, searchQuery: '', searchResults: [], isSearching: false, showResults: false },
+      { name: '', type: 'stop', latitude: '', longitude: '', radius: 500, triggerMode: 'distance', triggerTime: 30, searchQuery: '', searchResults: [], isSearching: false, showResults: false },
     ]);
   };
 
