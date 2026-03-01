@@ -425,8 +425,14 @@ Or copy trip details and paste here.`;
                       const timeoutId = setTimeout(() => searchPlace(e.target.value, index), 500);
                       return () => clearTimeout(timeoutId);
                     }}
+                    onFocus={(e) => {
+                      setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 300);
+                    }}
                     placeholder="Search for a place..."
                     className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 pl-10 text-sm"
+                    data-testid={`waypoint-search-${index}`}
                   />
                   {waypoint.isSearching && (
                     <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-400 animate-spin" />
