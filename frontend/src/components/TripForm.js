@@ -9,7 +9,7 @@ import { MapPin, Save, Plus, X, Search, Loader2, Navigation2, Sparkles, Copy } f
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const TripForm = ({ onClose, prefillData = null, editTrip = null, editAlarms = null }) => {
+const TripForm = ({ onClose, prefillData = null, editTrip = null, editAlarms = null, userLocation = null }) => {
   const [tripName, setTripName] = useState('');
   const [description, setDescription] = useState('');
   const [waypoints, setWaypoints] = useState([
