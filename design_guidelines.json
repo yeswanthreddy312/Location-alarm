@@ -1,0 +1,125 @@
+{
+  "design_system": {
+    "name": "Nocturnal Navigator",
+    "description": "A deep, bioluminescent aesthetic designed for travelers and night commuters. Uses high-contrast neon accents against a void-black background to ensure visibility without glare.",
+    "theme_strategy": "force_dark_mode",
+    "typography": {
+      "font_family_heading": "Manrope",
+      "font_family_body": "Outfit",
+      "font_provider": "google_fonts",
+      "scale": {
+        "h1": "text-4xl md:text-5xl font-bold tracking-tight",
+        "h2": "text-3xl font-semibold tracking-tight",
+        "h3": "text-2xl font-medium",
+        "body": "text-base leading-relaxed",
+        "caption": "text-xs tracking-wider uppercase opacity-70"
+      }
+    },
+    "colors": {
+      "palette": {
+        "background": "#020617",
+        "foreground": "#F8FAFC",
+        "primary": "#10B981",
+        "primary_foreground": "#020617",
+        "secondary": "#1E293B",
+        "secondary_foreground": "#E2E8F0",
+        "accent": "#F97316",
+        "accent_foreground": "#FFFFFF",
+        "muted": "#0F172A",
+        "muted_foreground": "#94A3B8",
+        "border": "#1E293B",
+        "input": "#1E293B",
+        "ring": "#10B981"
+      },
+      "gradients": {
+        "radar_sweep": "conic-gradient(from 0deg, transparent 0deg, rgba(16, 185, 129, 0.1) 360deg)",
+        "glass_surface": "linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%)"
+      }
+    },
+    "spacing": {
+      "container_padding": "p-6 md:p-8",
+      "section_gap": "gap-8",
+      "element_gap": "gap-4"
+    },
+    "radius": {
+      "default": "rounded-xl",
+      "button": "rounded-full",
+      "input": "rounded-lg"
+    },
+    "shadows": {
+      "neon_glow": "0 0 20px -5px rgba(16, 185, 129, 0.3)",
+      "glass": "0 4px 30px rgba(0, 0, 0, 0.1)"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": {
+      "base": "backdrop-filter backdrop-blur-xl bg-slate-900/60 border border-white/10 shadow-2xl"
+    },
+    "map_style": {
+      "dark_mode_filter": "invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)",
+      "note": "Apply this CSS filter to the Leaflet tile layer to create a dark mode map without paid API keys."
+    },
+    "animations": {
+      "pulse_marker": "@keyframes pulse-ring { 0% { transform: scale(0.33); opacity: 0.8; } 80%, 100% { opacity: 0; } }",
+      "radar_spin": "@keyframes radar-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }"
+    }
+  },
+  "layout_strategy": {
+    "mobile_first": true,
+    "structure": {
+      "map_layer": "fixed inset-0 z-0",
+      "ui_layer": "relative z-10 pointer-events-none",
+      "interactive_elements": "pointer-events-auto"
+    },
+    "grid_system": "grid grid-cols-1 md:grid-cols-12 gap-4"
+  },
+  "components": {
+    "map_view": {
+      "library": "react-leaflet",
+      "tile_url": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "attribution": "&copy; OpenStreetMap contributors",
+      "behavior": "Full screen, user location tracking enabled",
+      "custom_marker": "Use a divIcon with CSS pulsing effect for current location and alarm targets."
+    },
+    "alarm_list": {
+      "style": "Glassmorphic cards floating over the map bottom or side drawer.",
+      "interaction": "Swipe to delete, toggle switch for active state."
+    },
+    "bottom_sheet": {
+      "library": "vaul",
+      "usage": "Use for adding/editing alarms. Drag to dismiss."
+    },
+    "fab": {
+      "position": "fixed bottom-8 right-8",
+      "style": "w-16 h-16 bg-primary text-primary-foreground rounded-full shadow-neon_glow flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+    }
+  },
+  "assets": {
+    "icons": {
+      "library": "lucide-react",
+      "mapping": {
+        "location": "MapPin",
+        "alarm": "Bell",
+        "settings": "Settings",
+        "add": "Plus",
+        "list": "List",
+        "close": "X",
+        "check": "Check"
+      }
+    }
+  },
+  "universal_guidelines": [
+    "Do not use gradients for text or borders unless strictly necessary for the 'neon' effect.",
+    "Ensure all text on the map has a text-shadow for readability against variable backgrounds.",
+    "Use 'sonner' for all notifications (e.g., 'Alarm Set', 'Wake Up!').",
+    "The map tiles MUST be inverted using CSS filters to achieve the dark theme without API keys.",
+    "All interactive elements must have a minimum touch target of 44x44px.",
+    "Use 'data-testid' for all key interaction points."
+  ],
+  "instructions_to_main_agent": [
+    "INSTALLATION: You MUST run 'yarn add leaflet react-leaflet @types/leaflet' immediately.",
+    "MAP FIX: Create a 'Map.css' file to handle the dark mode filter: `.leaflet-layer { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%); }`.",
+    "PWA: Ensure the 'manifest.json' and service worker setup supports offline map usage if possible, or at least graceful degradation.",
+    "AUDIO: Use the HTML5 Audio API for the alarm sound. Preload a simple beep or alarm sound file."
+  ]
+}
