@@ -35,7 +35,10 @@ const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
     } else if (tempMarker) {
       setLatitude(tempMarker.lat.toString());
       setLongitude(tempMarker.lng.toString());
-      setSearchQuery('Location from map');
+      setSearchQuery(tempMarker.address || `Location from map (${tempMarker.lat.toFixed(4)}, ${tempMarker.lng.toFixed(4)})`);
+      if (tempMarker.name) {
+        setName(tempMarker.name);
+      }
     } else if (userLocation) {
       setLatitude(userLocation.lat.toString());
       setLongitude(userLocation.lng.toString());
