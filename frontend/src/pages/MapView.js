@@ -317,12 +317,25 @@ const MapView = () => {
     }
   };
 
-  const handleMapClick = (latlng) => {
+  const handleMapClick = async (latlng) => {
     setTempMarker(latlng);
-    toast.info('Location selected from map', {
-      description: 'Click + to create alarm here',
-      duration: 3000,
-    });
+    // Auto-open alarm drawer with this location
+    setSelectedAlarm(null);
+    setAddMode('alarm');
+    setShowAddDrawer(true);
+
+    // Reverse geocode to get address
+    try {
+      const response = await axios.get(`${API}/reverse-geocode`, {
+        params: { lat: latlng.lat, lon: latlng.lng }
+      });
+      if (response.data.success) {
+        const addr = response.data.display_name;
+        setTempMarker({ ...latlng, address: addr, name: addr.split(',')[0] });
+      }
+    } catch (err) {
+      // Silently fail — coordinates are still set
+    }
   };
 
   const handleAddAlarm = () => {
