@@ -53,17 +53,12 @@ const MapView = () => {
   const [trips, setTrips] = useState([]);
   const [tripAlarms, setTripAlarms] = useState({});
 
-  const fetchTrips = useCallback(async () => {
-    try {
-      const res = await axios.get(`${API}/trips`);
-      setTrips(res.data);
-      const aMap = {};
-      for (const trip of res.data) {
-        const aRes = await axios.get(`${API}/trips/${trip.id}/alarms`);
-        aMap[trip.id] = aRes.data;
-      }
-      setTripAlarms(aMap);
-    } catch {}
+  const fetchTrips = useCallback(() => {
+    const allTrips = storage.getTrips();
+    setTrips(allTrips);
+    const aMap = {};
+    allTrips.forEach(t => { aMap[t.id] = storage.getAlarmsByTrip(t.id); });
+    setTripAlarms(aMap);
   }, []);
 
   useEffect(() => { fetchTrips(); }, [fetchTrips]);
