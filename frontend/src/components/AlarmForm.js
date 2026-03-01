@@ -11,7 +11,7 @@ import { MapPin, Save, Search, Loader2 } from 'lucide-react';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const AlarmForm = ({ alarm, userLocation, onClose }) => {
+const AlarmForm = ({ alarm, userLocation, tempMarker, onClose }) => {
   const [name, setName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -32,11 +32,15 @@ const AlarmForm = ({ alarm, userLocation, onClose }) => {
       setRadius([alarm.radius]);
       setIsActive(alarm.is_active);
       setRecurring(alarm.recurring);
+    } else if (tempMarker) {
+      setLatitude(tempMarker.lat.toString());
+      setLongitude(tempMarker.lng.toString());
+      setSearchQuery('Location from map');
     } else if (userLocation) {
       setLatitude(userLocation.lat.toString());
       setLongitude(userLocation.lng.toString());
     }
-  }, [alarm, userLocation]);
+  }, [alarm, userLocation, tempMarker]);
 
   const searchPlace = async (query) => {
     if (!query || query.length < 3) {
