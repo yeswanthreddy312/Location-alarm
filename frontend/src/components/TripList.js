@@ -158,13 +158,14 @@ const TripList = ({ onSelectTrip, onEditTrip }) => {
               {/* Actions */}
               <div className="flex gap-2">
                 <Button
-                  onClick={() => onSelectTrip && onSelectTrip(trip)}
+                  onClick={() => onEditTrip && onEditTrip(trip, alarms)}
                   variant="outline"
                   size="sm"
-                  className="flex-1 bg-slate-700/50 border-slate-600 text-white hover:bg-slate-600"
+                  className="flex-1 bg-emerald-500/20 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30"
+                  data-testid={`edit-trip-${trip.id}`}
                 >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  View on Map
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
                 </Button>
                 <Button
                   onClick={() => deleteTrip(trip.id)}
