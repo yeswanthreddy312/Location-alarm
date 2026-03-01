@@ -162,6 +162,8 @@ const TripForm = ({ onClose, editTrip = null, editAlarms = null, userLocation = 
           trip_id: tripId,
           sequence: i + 1,
           waypoint_type: wp.type,
+          trigger_mode: wp.triggerMode,
+          trigger_time: wp.triggerMode === 'time' ? wp.triggerTime : null,
         });
       }
 
