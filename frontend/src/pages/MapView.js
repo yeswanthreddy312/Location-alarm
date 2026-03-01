@@ -73,8 +73,9 @@ const MapView = () => {
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [showListDrawer, setShowListDrawer] = useState(false);
   const [selectedAlarm, setSelectedAlarm] = useState(null);
-  const [mapCenter, setMapCenter] = useState([20, 0]);
+  const [mapCenter, setMapCenter] = useState([28.6139, 77.2090]); // Default: New Delhi
   const [isTracking, setIsTracking] = useState(false);
+  const [mapReady, setMapReady] = useState(true); // Always show map
   const watchIdRef = useRef(null);
   const audioRef = useRef(null);
   const triggeredAlarmsRef = useRef(new Set());
