@@ -69,11 +69,9 @@ const AlarmBuilder = ({ onClose, userLocation, tempMarker, editAlarm, editTrip, 
     if (!query || query.length < 3) { setForm(f => ({ ...f, searchResults: [], showResults: false })); return; }
     setForm(f => ({ ...f, isSearching: true }));
     try {
-      const params = { q: query, limit: 5 };
-      if (userLocation) { params.lat = userLocation.lat; params.lon = userLocation.lng; }
-      const res = await axios.get(`${API}/geocode`, { params });
-      if (res.data.success && res.data.results) {
-        setForm(f => ({ ...f, searchResults: res.data.results, showResults: true }));
+      const results = await searchPlaces(query, userLocation?.lat, userLocation?.lng);
+      if (results.length > 0) {
+        setForm(f => ({ ...f, searchResults: results, showResults: true }));
       } else {
         setForm(f => ({ ...f, searchResults: [], showResults: false }));
       }
