@@ -316,56 +316,56 @@ const MapView = () => {
     <div className="relative h-full w-full">
       {/* Map */}
       <div className="absolute inset-0 z-0">
-        {userLocation && (
-          <MapContainer
-            center={mapCenter}
-            zoom={13}
-            className="h-full w-full"
-            zoomControl={false}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            />
-            <MapController center={mapCenter} />
-            
-            {/* Current Location Marker */}
+        <MapContainer
+          center={mapCenter}
+          zoom={13}
+          className="h-full w-full"
+          zoomControl={false}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          />
+          <MapController center={mapCenter} />
+          
+          {/* Current Location Marker */}
+          {userLocation && (
             <Marker position={[userLocation.lat, userLocation.lng]} icon={currentLocationIcon}>
               <Popup>Your Current Location</Popup>
             </Marker>
+          )}
 
-            {/* Alarm Markers */}
-            {alarms.map((alarm) => (
-              <React.Fragment key={alarm.id}>
-                <Marker
-                  position={[alarm.latitude, alarm.longitude]}
-                  icon={alarmIcon}
-                  opacity={alarm.is_active ? 1 : 0.5}
-                >
-                  <Popup>
-                    <div className="text-gray-900">
-                      <strong>{alarm.name}</strong>
-                      <br />
-                      Radius: {alarm.radius}m
-                      <br />
-                      {alarm.is_active ? '🔔 Active' : '🔕 Inactive'}
-                    </div>
-                  </Popup>
-                </Marker>
-                <Circle
-                  center={[alarm.latitude, alarm.longitude]}
-                  radius={alarm.radius}
-                  pathOptions={{
-                    color: alarm.is_active ? '#10B981' : '#94A3B8',
-                    fillColor: alarm.is_active ? '#10B981' : '#94A3B8',
-                    fillOpacity: 0.1,
-                    weight: 2,
-                  }}
-                />
-              </React.Fragment>
-            ))}
-          </MapContainer>
-        )}
+          {/* Alarm Markers */}
+          {alarms.map((alarm) => (
+            <React.Fragment key={alarm.id}>
+              <Marker
+                position={[alarm.latitude, alarm.longitude]}
+                icon={alarmIcon}
+                opacity={alarm.is_active ? 1 : 0.5}
+              >
+                <Popup>
+                  <div className="text-gray-900">
+                    <strong>{alarm.name}</strong>
+                    <br />
+                    Radius: {alarm.radius}m
+                    <br />
+                    {alarm.is_active ? '🔔 Active' : '🔕 Inactive'}
+                  </div>
+                </Popup>
+              </Marker>
+              <Circle
+                center={[alarm.latitude, alarm.longitude]}
+                radius={alarm.radius}
+                pathOptions={{
+                  color: alarm.is_active ? '#10B981' : '#94A3B8',
+                  fillColor: alarm.is_active ? '#10B981' : '#94A3B8',
+                  fillOpacity: 0.1,
+                  weight: 2,
+                }}
+              />
+            </React.Fragment>
+          ))}
+        </MapContainer>
       </div>
 
       {/* UI Layer */}
